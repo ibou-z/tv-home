@@ -309,6 +309,118 @@ html, body {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
+/* ==========================================================================
+   Pointer-Based Edge Scrolling Indicators & Track Nav Buttons
+   ========================================================================== */
+.edgeScrollIndicator {
+  position: absolute;
+  left: 0;
+  width: 1920px;
+  height: 90px;
+  z-index: 60;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  -webkit-transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease;
+}
+
+#topScrollIndicator {
+  top: 105px;
+  background: -webkit-linear-gradient(top, rgba(0, 240, 255, 0.35) 0%, rgba(2, 4, 10, 0.85) 60%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.35) 0%, rgba(2, 4, 10, 0.85) 60%, rgba(0, 0, 0, 0) 100%);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+#bottomScrollIndicator {
+  bottom: 60px;
+  background: -webkit-linear-gradient(bottom, rgba(121, 40, 202, 0.4) 0%, rgba(2, 4, 10, 0.88) 60%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(0deg, rgba(121, 40, 202, 0.4) 0%, rgba(2, 4, 10, 0.88) 60%, rgba(0, 0, 0, 0) 100%);
+  border-top: 1px solid rgba(121, 40, 202, 0.35);
+}
+
+.edgeScrollIndicator.active,
+.edgeScrollIndicator:hover {
+  opacity: 1;
+}
+
+.edgeScrollIndicator.disabled {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.edgeScrollPill {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  padding: 8px 24px;
+  border-radius: 20px;
+  background: rgba(14, 18, 32, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 240, 255, 0.45);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.edgeScrollPill .edgeArrow {
+  font-size: 20px;
+  margin-right: 10px;
+  color: #00f0ff;
+}
+
+#bottomScrollIndicator .edgeScrollPill .edgeArrow {
+  color: #d946ef;
+}
+
+.trackNavBtn {
+  position: absolute;
+  top: 96px;
+  width: 52px;
+  height: 72px;
+  border-radius: 18px;
+  background: rgba(14, 18, 32, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  font-size: 26px;
+  cursor: pointer;
+  z-index: 25;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.7);
+  opacity: 0.82;
+  -webkit-transition: -webkit-transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+.trackNavBtn:hover {
+  opacity: 1;
+  -webkit-transform: scale(1.12);
+  transform: scale(1.12);
+  border-color: #00f0ff;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+}
+
+.trackNavLeft { left: 18px; }
+.trackNavRight { right: 18px; }
+
+.heroDot {
+  cursor: pointer;
+}
+
 .itemsTrack {
   position: relative;
   display: -webkit-flex;
@@ -1374,6 +1486,18 @@ html, body {
     </div>
   </div>
 
+  <!-- Pointer Edge Scroll Indicators (Samsung TV Pointer Navigation) -->
+  <div id="topScrollIndicator" class="edgeScrollIndicator disabled" title="Scroll Up">
+    <div class="edgeScrollPill">
+      <span class="edgeArrow">&#9650;</span> Scroll Up
+    </div>
+  </div>
+  <div id="bottomScrollIndicator" class="edgeScrollIndicator disabled" title="Scroll Down">
+    <div class="edgeScrollPill">
+      <span class="edgeArrow">&#9660;</span> Scroll Down
+    </div>
+  </div>
+
   <!-- Rows Container Viewport -->
   <div id="rowsViewport">
     <div id="rowsTrack">
@@ -1405,18 +1529,24 @@ html, body {
       <!-- Row 1: Apps Row -->
       <div class="tvRow" id="rowApps">
         <div class="rowHeading">Your Apps <span style="font-size:18px; font-weight:normal; color:rgba(255,255,255,0.5); margin-left:14px;">(Press 1-9 on remote for quick launch)</span></div>
+        <div class="trackNavBtn trackNavLeft" id="btnAppsTrackLeft" title="Scroll Left">&#9664;</div>
+        <div class="trackNavBtn trackNavRight" id="btnAppsTrackRight" title="Scroll Right">&#9654;</div>
         <div class="itemsTrack" id="appsTrack"></div>
       </div>
 
       <!-- Row 2: Continue Watching Row -->
       <div class="tvRow" id="rowWatch">
         <div class="rowHeading">Continue Watching</div>
+        <div class="trackNavBtn trackNavLeft" id="btnWatchTrackLeft" title="Scroll Left">&#9664;</div>
+        <div class="trackNavBtn trackNavRight" id="btnWatchTrackRight" title="Scroll Right">&#9654;</div>
         <div class="itemsTrack" id="watchTrack"></div>
       </div>
 
       <!-- Row 3: Inputs & Settings Row -->
       <div class="tvRow" id="rowSettings">
         <div class="rowHeading">Inputs &amp; Settings</div>
+        <div class="trackNavBtn trackNavLeft" id="btnSettingsTrackLeft" title="Scroll Left">&#9664;</div>
+        <div class="trackNavBtn trackNavRight" id="btnSettingsTrackRight" title="Scroll Right">&#9654;</div>
         <div class="itemsTrack" id="settingsTrack"></div>
       </div>
     </div>
@@ -1787,8 +1917,18 @@ html, body {
   var appsTrack = $("appsTrack");
   var watchTrack = $("watchTrack");
   var settingsTrack = $("settingsTrack");
+  var topIndicator = $("topScrollIndicator");
+  var bottomIndicator = $("bottomScrollIndicator");
   var toastBox = $("toastBox");
   var toastTimer = null;
+
+  /* ---------- Pointer-Based Edge Scrolling State ---------- */
+  var currentScrollY = 0;
+  var maxScrollY = 820;
+  var edgeScrollSpeed = 0;
+  var edgeScrollRaf = null;
+  var isPointerEdgeScrolling = false;
+  var pointerWatchdogTimer = null;
 
   /* ---------- State ---------- */
   var userApps = [];
@@ -2061,6 +2201,9 @@ html, body {
           setFocus(1, index);
           activateCurrentItem();
         };
+        card.onmouseenter = function () {
+          setFocus(1, index, true);
+        };
       })(app, i);
 
       appsTrack.appendChild(card);
@@ -2097,6 +2240,9 @@ html, body {
     addCard.onclick = function () {
       setFocus(1, userApps.length);
       openAppEditorModal();
+    };
+    addCard.onmouseenter = function () {
+      setFocus(1, userApps.length, true);
     };
 
     appsTrack.appendChild(addCard);
@@ -2161,6 +2307,9 @@ html, body {
           setFocus(2, index);
           activateCurrentItem();
         };
+        card.onmouseenter = function () {
+          setFocus(2, index, true);
+        };
       })(item, i);
 
       watchTrack.appendChild(card);
@@ -2220,6 +2369,9 @@ html, body {
           setFocus(3, index);
           activateCurrentItem();
         };
+        card.onmouseenter = function () {
+          setFocus(3, index, true);
+        };
       })(item, i);
 
       settingsTrack.appendChild(card);
@@ -2249,9 +2401,15 @@ html, body {
       setFocus(0, 0);
       activateCurrentItem();
     };
+    btnPlay.onmouseenter = function () {
+      setFocus(0, 0, true);
+    };
     btnList.onclick = function () {
       setFocus(0, 1);
       activateCurrentItem();
+    };
+    btnList.onmouseenter = function () {
+      setFocus(0, 1, true);
     };
 
     rowItems[0].push({ el: btnPlay, type: "heroPlay", data: null, color: "#ffffff" });
@@ -2263,6 +2421,12 @@ html, body {
     for (var i = 0; i < HERO_ITEMS.length; i++) {
       var dot = document.createElement("span");
       dot.className = "heroDot" + (i === 0 ? " active" : "");
+      (function (dotIdx) {
+        dot.onclick = function () {
+          renderHeroSlide(dotIdx);
+          startHeroRotation();
+        };
+      })(i);
       dotsContainer.appendChild(dot);
     }
 
@@ -2310,7 +2474,7 @@ html, body {
     }
   }
 
-  function setFocus(row, col) {
+  function setFocus(row, col, keepScroll) {
     // Clear old focus
     var oldRow = rowItems[nav.row];
     if (oldRow && oldRow[nav.col]) {
@@ -2335,12 +2499,18 @@ html, body {
       setAmbientGlow(currentTarget.color || HERO_ITEMS[heroIndex].c1);
     }
 
-    // Scroll vertical row into view
-    var rowY = 0;
-    if (nav.row === 1) { rowY = 320; }
-    else if (nav.row === 2) { rowY = 560; }
-    else if (nav.row === 3) { rowY = 820; }
-    setElementTransform(rowsTrack, "translateY(" + (-rowY) + "px)");
+    if (!keepScroll) {
+      // Scroll vertical row into view
+      var rowY = 0;
+      if (nav.row === 1) { rowY = 320; }
+      else if (nav.row === 2) { rowY = 560; }
+      else if (nav.row === 3) { rowY = 820; }
+      currentScrollY = rowY;
+      rowsTrack.style.webkitTransition = "-webkit-transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
+      rowsTrack.style.transition = "transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
+      setElementTransform(rowsTrack, "translateY(" + (-currentScrollY) + "px)");
+      updateScrollIndicators();
+    }
 
     // Scroll horizontal track into view
     scrollTrackIntoView(nav.row, nav.col);
@@ -2449,6 +2619,9 @@ html, body {
   function openLaunchOverlay(app) {
     launchTargetApp = app;
     nav.modal = "launch";
+    nav.modalIndex = 0;
+    if (isPointerEdgeScrolling) { stopEdgeScroll(); }
+    updateScrollIndicators();
 
     $("launchName").innerHTML = app.name;
     $("launchSub").innerHTML = "Samsung TV Launch Handler";
@@ -2461,9 +2634,13 @@ html, body {
     $("launchTechnicalDetail").innerHTML = detailText;
 
     $("launchOverlay").className = "active";
-    $("btnLaunchNow").className = "actionBtn actionBtnPrimary focused";
-    $("btnLaunchUri").className = "actionBtn actionBtnSecondary";
-    $("btnLaunchCancel").className = "actionBtn actionBtnSecondary";
+    highlightLaunchModalFocus();
+  }
+
+  function highlightLaunchModalFocus() {
+    $("btnLaunchNow").className = "actionBtn actionBtnPrimary" + (nav.modalIndex === 0 ? " focused" : "");
+    $("btnLaunchUri").className = "actionBtn actionBtnSecondary" + (nav.modalIndex === 1 ? " focused" : "");
+    $("btnLaunchCancel").className = "actionBtn actionBtnSecondary" + (nav.modalIndex === 2 ? " focused" : "");
   }
 
   function executeOpenTvInterface() {
@@ -2501,16 +2678,38 @@ html, body {
   function closeLaunchOverlay() {
     $("launchOverlay").className = "";
     nav.modal = null;
+    updateScrollIndicators();
   }
 
   $("btnLaunchNow").onclick = executeOpenTvInterface;
   $("btnLaunchUri").onclick = executeTryNativeUriScheme;
   $("btnLaunchCancel").onclick = closeLaunchOverlay;
 
+  $("btnLaunchNow").onmouseenter = function () {
+    if (nav.modal === "launch") {
+      nav.modalIndex = 0;
+      highlightLaunchModalFocus();
+    }
+  };
+  $("btnLaunchUri").onmouseenter = function () {
+    if (nav.modal === "launch") {
+      nav.modalIndex = 1;
+      highlightLaunchModalFocus();
+    }
+  };
+  $("btnLaunchCancel").onmouseenter = function () {
+    if (nav.modal === "launch") {
+      nav.modalIndex = 2;
+      highlightLaunchModalFocus();
+    }
+  };
+
   /* ---------- Wallpaper Modal Engine ---------- */
   function openWallpaperModal() {
     nav.modal = "wallpaper";
     nav.modalIndex = 0;
+    if (isPointerEdgeScrolling) { stopEdgeScroll(); }
+    updateScrollIndicators();
     renderWallpaperGrid();
     $("wallpaperModal").className = "modalOverlay active";
   }
@@ -2518,6 +2717,7 @@ html, body {
   function closeWallpaperModal() {
     $("wallpaperModal").className = "modalOverlay";
     nav.modal = null;
+    updateScrollIndicators();
   }
 
   function renderWallpaperGrid() {
@@ -2560,9 +2760,15 @@ html, body {
 
       (function (wpItem, idx) {
         card.onclick = function () {
+          nav.modalIndex = idx;
+          highlightWallpaperModalFocus();
           applyWallpaper(wpItem.id);
           renderWallpaperGrid();
           showToast("Applied: " + wpItem.name);
+        };
+        card.onmouseenter = function () {
+          nav.modalIndex = idx;
+          highlightWallpaperModalFocus();
         };
       })(wp, i);
 
@@ -2639,6 +2845,8 @@ html, body {
     nav.modal = "appEditor";
     nav.modalIndex = 0;
     editingAppId = null;
+    if (isPointerEdgeScrolling) { stopEdgeScroll(); }
+    updateScrollIndicators();
     resetAppEditorForm();
     renderAppEditorList();
     renderEditorColorRow();
@@ -2649,6 +2857,7 @@ html, body {
   function closeAppEditorModal() {
     $("appEditorModal").className = "modalOverlay";
     nav.modal = null;
+    updateScrollIndicators();
   }
 
   function renderEditorColorRow() {
@@ -2750,6 +2959,10 @@ html, body {
         row.onclick = function () {
           nav.modalIndex = index;
           startEditApp(appObj);
+          highlightAppEditorFocus();
+        };
+        row.onmouseenter = function () {
+          nav.modalIndex = index;
           highlightAppEditorFocus();
         };
       })(app, i);
@@ -2879,6 +3092,318 @@ html, body {
 
   $("btnCloseAppModal").onclick = closeAppEditorModal;
 
+  /* ---------- Pointer-Based Edge Scrolling & Navigation Engine ---------- */
+  var requestAnimFrame = window.requestAnimationFrame ||
+                         window.webkitRequestAnimationFrame ||
+                         window.mozRequestAnimationFrame ||
+                         function (cb) { return setTimeout(cb, 16); };
+
+  var cancelAnimFrame = window.cancelAnimationFrame ||
+                        window.webkitCancelAnimationFrame ||
+                        window.mozCancelAnimationFrame ||
+                        clearTimeout;
+
+  function resetPointerWatchdog() {
+    clearTimeout(pointerWatchdogTimer);
+    pointerWatchdogTimer = setTimeout(function () {
+      if (isPointerEdgeScrolling) {
+        stopEdgeScroll();
+      }
+    }, 1800);
+  }
+
+  function handlePointerMove(e) {
+    e = e || window.event;
+    resetPointerWatchdog();
+
+    if (nav.modal) {
+      if (isPointerEdgeScrolling) { stopEdgeScroll(); }
+      return;
+    }
+
+    var winH = window.innerHeight || document.documentElement.clientHeight || 1080;
+    var zoneH = winH * 0.18;
+    var newSpeed = 0;
+
+    if (e.clientY < zoneH) {
+      if (currentScrollY > 0) {
+        var topIntensity = Math.max(0, Math.min(1, (zoneH - e.clientY) / zoneH));
+        newSpeed = -(4 + Math.round(topIntensity * 12));
+      }
+    } else if (e.clientY > winH - zoneH) {
+      if (currentScrollY < maxScrollY) {
+        var bottomDistance = e.clientY - (winH - zoneH);
+        var bottomIntensity = Math.max(0, Math.min(1, bottomDistance / zoneH));
+        newSpeed = (4 + Math.round(bottomIntensity * 12));
+      }
+    }
+
+    edgeScrollSpeed = newSpeed;
+
+    if (edgeScrollSpeed !== 0) {
+      if (!isPointerEdgeScrolling) {
+        startEdgeScroll();
+      }
+    } else {
+      if (isPointerEdgeScrolling) {
+        stopEdgeScroll();
+      }
+    }
+
+    updateScrollIndicators();
+  }
+
+  function startEdgeScroll() {
+    isPointerEdgeScrolling = true;
+    rowsTrack.style.webkitTransition = "none";
+    rowsTrack.style.transition = "none";
+    if (edgeScrollRaf) {
+      cancelAnimFrame(edgeScrollRaf);
+    }
+    edgeScrollRaf = requestAnimFrame(stepEdgeScroll);
+  }
+
+  function stepEdgeScroll() {
+    if (!isPointerEdgeScrolling || edgeScrollSpeed === 0 || nav.modal) {
+      stopEdgeScroll();
+      return;
+    }
+
+    var nextY = currentScrollY + edgeScrollSpeed;
+    if (nextY <= 0) {
+      nextY = 0;
+      edgeScrollSpeed = 0;
+    } else if (nextY >= maxScrollY) {
+      nextY = maxScrollY;
+      edgeScrollSpeed = 0;
+    }
+
+    if (nextY !== currentScrollY) {
+      currentScrollY = nextY;
+      setElementTransform(rowsTrack, "translateY(" + (-currentScrollY) + "px)");
+      updateScrollIndicators();
+    }
+
+    if (edgeScrollSpeed !== 0) {
+      edgeScrollRaf = requestAnimFrame(stepEdgeScroll);
+    } else {
+      stopEdgeScroll();
+    }
+  }
+
+  function stopEdgeScroll() {
+    isPointerEdgeScrolling = false;
+    edgeScrollSpeed = 0;
+    if (edgeScrollRaf) {
+      cancelAnimFrame(edgeScrollRaf);
+      edgeScrollRaf = null;
+    }
+    rowsTrack.style.webkitTransition = "-webkit-transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
+    rowsTrack.style.transition = "transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
+    syncActiveRowFromScroll();
+    updateScrollIndicators();
+  }
+
+  function smoothScrollTo(targetY) {
+    if (edgeScrollRaf) {
+      cancelAnimFrame(edgeScrollRaf);
+      edgeScrollRaf = null;
+    }
+    isPointerEdgeScrolling = false;
+    edgeScrollSpeed = 0;
+    targetY = Math.max(0, Math.min(maxScrollY, targetY));
+    currentScrollY = targetY;
+    rowsTrack.style.webkitTransition = "-webkit-transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
+    rowsTrack.style.transition = "transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
+    setElementTransform(rowsTrack, "translateY(" + (-currentScrollY) + "px)");
+    syncActiveRowFromScroll();
+    updateScrollIndicators();
+  }
+
+  function syncActiveRowFromScroll() {
+    var activeRowIdx = 0;
+    if (currentScrollY < 160) {
+      activeRowIdx = 0;
+    } else if (currentScrollY < 440) {
+      activeRowIdx = 1;
+    } else if (currentScrollY < 690) {
+      activeRowIdx = 2;
+    } else {
+      activeRowIdx = 3;
+    }
+
+    var allRows = $("rowsTrack").getElementsByClassName("tvRow");
+    for (var r = 0; r < allRows.length; r++) {
+      if (r === activeRowIdx && activeRowIdx !== 0) {
+        if (allRows[r].className.indexOf("active") === -1) {
+          allRows[r].className += " active";
+        }
+      } else if (r !== 0) {
+        allRows[r].className = allRows[r].className.replace(/\s*active/g, "");
+      }
+    }
+
+    if (nav.row !== activeRowIdx) {
+      var oldRow = rowItems[nav.row];
+      if (oldRow && oldRow[nav.col]) {
+        oldRow[nav.col].el.className = oldRow[nav.col].el.className.replace(/\s*focused/g, "");
+      }
+      nav.row = activeRowIdx;
+      if (nav.col >= rowItems[nav.row].length) {
+        nav.col = Math.max(0, rowItems[nav.row].length - 1);
+      }
+      var target = rowItems[nav.row][nav.col];
+      if (target) {
+        target.el.className += " focused";
+        setAmbientGlow(target.color || HERO_ITEMS[heroIndex].c1);
+      }
+    }
+  }
+
+  function updateScrollIndicators() {
+    if (!topIndicator || !bottomIndicator) { return; }
+    if (nav.modal) {
+      topIndicator.className = "edgeScrollIndicator disabled";
+      bottomIndicator.className = "edgeScrollIndicator disabled";
+      return;
+    }
+
+    if (currentScrollY > 10) {
+      topIndicator.className = "edgeScrollIndicator" + (edgeScrollSpeed < 0 ? " active" : "");
+    } else {
+      topIndicator.className = "edgeScrollIndicator disabled";
+    }
+
+    if (currentScrollY < maxScrollY - 10) {
+      bottomIndicator.className = "edgeScrollIndicator" + (edgeScrollSpeed > 0 ? " active" : "");
+    } else {
+      bottomIndicator.className = "edgeScrollIndicator disabled";
+    }
+  }
+
+  // Edge Scroll Indicator Click & Hover Listeners
+  if (topIndicator) {
+    topIndicator.onclick = function (e) {
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      smoothScrollTo(Math.max(0, currentScrollY - 320));
+    };
+    topIndicator.onmouseenter = function () {
+      if (currentScrollY > 0 && !nav.modal) {
+        edgeScrollSpeed = -8;
+        if (!isPointerEdgeScrolling) { startEdgeScroll(); }
+      }
+    };
+    topIndicator.onmouseleave = function () {
+      if (isPointerEdgeScrolling && edgeScrollSpeed < 0) {
+        stopEdgeScroll();
+      }
+    };
+  }
+
+  if (bottomIndicator) {
+    bottomIndicator.onclick = function (e) {
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      smoothScrollTo(Math.min(maxScrollY, currentScrollY + 320));
+    };
+    bottomIndicator.onmouseenter = function () {
+      if (currentScrollY < maxScrollY && !nav.modal) {
+        edgeScrollSpeed = 8;
+        if (!isPointerEdgeScrolling) { startEdgeScroll(); }
+      }
+    };
+    bottomIndicator.onmouseleave = function () {
+      if (isPointerEdgeScrolling && edgeScrollSpeed > 0) {
+        stopEdgeScroll();
+      }
+    };
+  }
+
+  // Horizontal Track Nav Arrows for Pointer Users
+  function scrollTrackRelative(row, delta) {
+    if (row === 0) { return; }
+    var track = (row === 1) ? appsTrack : (row === 2) ? watchTrack : settingsTrack;
+    var currentOffset = track.offsetLeftDelta || 0;
+    var maxOffset = Math.max(0, track.scrollWidth - 1760);
+    var targetOffset = currentOffset + delta;
+    if (targetOffset < 0) { targetOffset = 0; }
+    if (targetOffset > maxOffset) { targetOffset = maxOffset; }
+    track.offsetLeftDelta = targetOffset;
+    setElementTransform(track, "translateX(" + (-targetOffset) + "px)");
+  }
+
+  var btnAppsLeft = $("btnAppsTrackLeft");
+  var btnAppsRight = $("btnAppsTrackRight");
+  var btnWatchLeft = $("btnWatchTrackLeft");
+  var btnWatchRight = $("btnWatchTrackRight");
+  var btnSettingsLeft = $("btnSettingsTrackLeft");
+  var btnSettingsRight = $("btnSettingsTrackRight");
+
+  if (btnAppsLeft) {
+    btnAppsLeft.onclick = function (e) {
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      scrollTrackRelative(1, -380);
+    };
+  }
+  if (btnAppsRight) {
+    btnAppsRight.onclick = function (e) {
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      scrollTrackRelative(1, 380);
+    };
+  }
+  if (btnWatchLeft) {
+    btnWatchLeft.onclick = function (e) {
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      scrollTrackRelative(2, -400);
+    };
+  }
+  if (btnWatchRight) {
+    btnWatchRight.onclick = function (e) {
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      scrollTrackRelative(2, 400);
+    };
+  }
+  if (btnSettingsLeft) {
+    btnSettingsLeft.onclick = function (e) {
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      scrollTrackRelative(3, -400);
+    };
+  }
+  if (btnSettingsRight) {
+    btnSettingsRight.onclick = function (e) {
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      scrollTrackRelative(3, 400);
+    };
+  }
+
+  // Mouse Wheel / Trackpad Vertical Scroll Listener
+  function handleWheel(e) {
+    if (nav.modal) { return; }
+    e = e || window.event;
+    var delta = e.deltaY || -e.wheelDelta || 0;
+    if (delta !== 0) {
+      if (e.preventDefault) { e.preventDefault(); }
+      var step = delta > 0 ? 110 : -110;
+      smoothScrollTo(currentScrollY + step);
+    }
+  }
+
+  // Global Pointer Listeners (Safe, Non-Stuck, Non-Disappearing)
+  if (window.addEventListener) {
+    window.addEventListener("mousemove", handlePointerMove, false);
+    window.addEventListener("mouseleave", stopEdgeScroll, false);
+    window.addEventListener("blur", stopEdgeScroll, false);
+    window.addEventListener("mouseup", stopEdgeScroll, false);
+    window.addEventListener("wheel", handleWheel, false);
+    window.addEventListener("mousewheel", handleWheel, false);
+    document.addEventListener("mouseleave", stopEdgeScroll, false);
+  } else {
+    document.onmousemove = handlePointerMove;
+    document.onmouseleave = stopEdgeScroll;
+    window.onblur = stopEdgeScroll;
+    document.onmouseup = stopEdgeScroll;
+    document.onmousewheel = handleWheel;
+  }
+
   /* ---------- Remote Control & Physical Key Navigation Engine ---------- */
   document.onkeydown = function (e) {
     e = e || window.event;
@@ -2892,8 +3417,11 @@ html, body {
         else if (nav.modal === "wallpaper") { closeWallpaperModal(); }
         else if (nav.modal === "appEditor") { closeAppEditorModal(); }
       } else if (code === 13) { // OK / Enter
-        if (nav.modal === "launch") { executeOpenTvInterface(); }
-        else if (nav.modal === "wallpaper") {
+        if (nav.modal === "launch") {
+          if (nav.modalIndex === 0) { executeOpenTvInterface(); }
+          else if (nav.modalIndex === 1) { executeTryNativeUriScheme(); }
+          else if (nav.modalIndex === 2) { closeLaunchOverlay(); }
+        } else if (nav.modal === "wallpaper") {
           var allWp = getAllWallpapers();
           if (allWp[nav.modalIndex]) {
             applyWallpaper(allWp[nav.modalIndex].id);
@@ -2906,14 +3434,20 @@ html, body {
           }
         }
       } else if (code === 37) { // Left
-        if (nav.modal === "wallpaper" && nav.modalIndex > 0) {
+        if (nav.modal === "launch" && nav.modalIndex > 0) {
+          nav.modalIndex--;
+          highlightLaunchModalFocus();
+        } else if (nav.modal === "wallpaper" && nav.modalIndex > 0) {
           nav.modalIndex--;
           highlightWallpaperModalFocus();
         } else if (nav.modal === "appEditor") {
           moveApp(nav.modalIndex, -1);
         }
       } else if (code === 39) { // Right
-        if (nav.modal === "wallpaper") {
+        if (nav.modal === "launch" && nav.modalIndex < 2) {
+          nav.modalIndex++;
+          highlightLaunchModalFocus();
+        } else if (nav.modal === "wallpaper") {
           var totalWp = getAllWallpapers().length;
           if (nav.modalIndex < totalWp - 1) {
             nav.modalIndex++;
@@ -3069,6 +3603,7 @@ html, body {
     } catch (e) {}
 
     setFocus(0, 0);
+    updateScrollIndicators();
     setTimeout(function () {
       stage.className = "ready";
     }, 80);
