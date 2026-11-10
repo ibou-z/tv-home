@@ -11,7 +11,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <style>
 /* ==========================================================================
-   Base & Resets (Samsung 2016 / ES5 / WebKit Compatible)
+   Base & Resets (Optimised for Samsung 2016 T-KTSDEUC-1410.1 / WebKit / ES5)
    ========================================================================== */
 html, body {
   margin: 0;
@@ -26,7 +26,7 @@ html, body {
   user-select: none;
 }
 
-/* Fixed 1920x1080 virtual stage, scaled to fit any viewport */
+/* Virtual 1920x1080 Stage scaled via transform to fit any display without distortion */
 #stage {
   position: absolute;
   left: 50%;
@@ -36,117 +36,139 @@ html, body {
   margin-left: -960px;
   margin-top: -540px;
   overflow: hidden;
-  background: #06080e;
+  background: #020409;
   -webkit-transform-origin: 50% 50%;
   transform-origin: 50% 50%;
   opacity: 0;
-  -webkit-transition: opacity 0.5s ease;
-  transition: opacity 0.5s ease;
+  -webkit-transition: opacity 0.4s ease;
+  transition: opacity 0.4s ease;
 }
 #stage.ready {
   opacity: 1;
 }
 
 /* ==========================================================================
-   Wallpapers & Background Layers
+   Colourful Fading Backgrounds (Liquid Glass & Natural Fade to Black)
    ========================================================================== */
-#bgLayer {
+#bgContainer {
   position: absolute;
   left: 0;
   top: 0;
   width: 1920px;
   height: 1080px;
   z-index: 1;
-  background-color: #06080e;
-  background-position: center center;
-  background-repeat: no-repeat;
-  -webkit-background-size: cover;
-  background-size: cover;
-  -webkit-transition: background 0.7s ease, opacity 0.7s ease;
-  transition: background 0.7s ease, opacity 0.7s ease;
+  background: #000000;
+  overflow: hidden;
 }
 
-#bgOverlay {
+/* Base deep layer */
+#bgBase {
   position: absolute;
   left: 0;
   top: 0;
   width: 1920px;
   height: 1080px;
-  z-index: 2;
-  background: -webkit-linear-gradient(top, rgba(5,7,14,0.3) 0%, rgba(5,7,14,0.7) 60%, rgba(5,7,14,0.96) 100%);
-  background: linear-gradient(180deg, rgba(5,7,14,0.3) 0%, rgba(5,7,14,0.7) 60%, rgba(5,7,14,0.96) 100%);
-  pointer-events: none;
+  background: #02040a;
 }
 
-/* Ambient glow system */
-.glowLayer {
+/* Vibrant Animated Liquid Color Orbs */
+#bgAuraMesh {
   position: absolute;
-  width: 1600px;
-  height: 1200px;
-  right: -300px;
-  top: -350px;
-  opacity: 0;
-  z-index: 2;
-  pointer-events: none;
-  -webkit-transition: opacity 0.9s ease;
-  transition: opacity 0.9s ease;
-}
-.glowLayer.on {
+  left: -200px;
+  top: -200px;
+  width: 2320px;
+  height: 1480px;
   opacity: 0.85;
+  -webkit-transition: opacity 0.8s ease;
+  transition: opacity 0.8s ease;
+  -webkit-animation: auraBreath 16s ease-in-out infinite alternate;
+  animation: auraBreath 16s ease-in-out infinite alternate;
 }
 
-#glowCool {
-  position: absolute;
-  left: -400px;
-  bottom: -400px;
-  width: 1300px;
-  height: 1100px;
-  z-index: 2;
-  pointer-events: none;
-  background: -webkit-radial-gradient(center, rgba(30, 80, 200, 0.22) 0%, rgba(0,0,0,0) 70%);
-  background: radial-gradient(ellipse at center, rgba(30, 80, 200, 0.22) 0%, rgba(0,0,0,0) 70%);
+@-webkit-keyframes auraBreath {
+  0% { -webkit-transform: translate3d(0, 0, 0) scale(1); }
+  50% { -webkit-transform: translate3d(40px, -25px, 0) scale(1.06); }
+  100% { -webkit-transform: translate3d(-30px, 30px, 0) scale(1.02); }
+}
+@keyframes auraBreath {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(40px, -25px, 0) scale(1.06); }
+  100% { transform: translate3d(-30px, 30px, 0) scale(1.02); }
 }
 
-/* Lightweight floating particles (Pure CSS, low CPU) */
-#particlesContainer {
+/* Smooth Natural Fade into Deep Black (Bottom & Screen Edges) */
+#bgVignetteFade {
   position: absolute;
   left: 0;
   top: 0;
   width: 1920px;
   height: 1080px;
-  z-index: 2;
+  pointer-events: none;
+  background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 40%, rgba(2,4,10,0.85) 75%, #000000 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 40%, rgba(2,4,10,0.85) 75%, #000000 100%);
+}
+
+#bgSideVignette {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  pointer-events: none;
+  background: -webkit-radial-gradient(50% 45%, circle, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 75%, #000000 100%);
+  background: radial-gradient(circle at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 75%, #000000 100%);
+}
+
+/* Lightweight Ambient Glow Spotlight that tracks current item */
+#dynamicAmbientGlow {
+  position: absolute;
+  right: -250px;
+  top: -250px;
+  width: 1500px;
+  height: 1200px;
+  pointer-events: none;
+  opacity: 0.65;
+  -webkit-transition: opacity 0.8s ease;
+  transition: opacity 0.8s ease;
+}
+
+/* Floating lightweight particles (Pure CSS keyframes, zero canvas CPU overhead) */
+#particlesStage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
   pointer-events: none;
   overflow: hidden;
-  display: block;
+  z-index: 2;
 }
-#particlesContainer.disabled {
+#particlesStage.hidden {
   display: none !important;
 }
-
-.particle {
+.tvParticle {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 0 12px rgba(130, 180, 255, 0.7);
-  -webkit-animation: driftParticle 14s infinite linear;
-  animation: driftParticle 14s infinite linear;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+  -webkit-animation: driftParticle 15s infinite linear;
+  animation: driftParticle 15s infinite linear;
 }
-
 @-webkit-keyframes driftParticle {
   0% { -webkit-transform: translateY(0px) translateX(0px); opacity: 0; }
-  15% { opacity: 0.6; }
-  85% { opacity: 0.6; }
-  100% { -webkit-transform: translateY(-400px) translateX(120px); opacity: 0; }
+  15% { opacity: 0.7; }
+  85% { opacity: 0.7; }
+  100% { -webkit-transform: translateY(-420px) translateX(90px); opacity: 0; }
 }
 @keyframes driftParticle {
   0% { transform: translateY(0px) translateX(0px); opacity: 0; }
-  15% { opacity: 0.6; }
-  85% { opacity: 0.6; }
-  100% { transform: translateY(-400px) translateX(120px); opacity: 0; }
+  15% { opacity: 0.7; }
+  85% { opacity: 0.7; }
+  100% { transform: translateY(-420px) translateX(90px); opacity: 0; }
 }
 
 /* ==========================================================================
-   Top Header Bar
+   Header Bar (Clock, Date, Greeting, Status)
    ========================================================================== */
 #topBar {
   position: absolute;
@@ -161,7 +183,7 @@ html, body {
 #logoArea {
   position: absolute;
   left: 80px;
-  top: 30px;
+  top: 28px;
   display: -webkit-flex;
   display: flex;
   -webkit-align-items: center;
@@ -169,50 +191,49 @@ html, body {
 }
 
 #logoOrb {
-  width: 48px;
-  height: 48px;
-  border-radius: 24px;
-  margin-right: 16px;
-  background: -webkit-linear-gradient(top left, #8ef0f7, #6b52ff 55%, #ff529a);
-  background: linear-gradient(135deg, #8ef0f7, #6b52ff 55%, #ff529a);
-  box-shadow: 0 4px 20px rgba(107, 82, 255, 0.6);
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  margin-right: 18px;
+  background: -webkit-linear-gradient(top left, #00f0ff, #7928ca 55%, #ff007f);
+  background: linear-gradient(135deg, #00f0ff, #7928ca 55%, #ff007f);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6), 0 0 45px rgba(121, 40, 202, 0.4);
 }
 
 #logoTitle {
-  font-size: 34px;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 800;
   letter-spacing: 0.5px;
   color: #ffffff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
 }
 
 #logoTag {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 2.5px;
+  color: rgba(255, 255, 255, 0.6);
   margin-left: 14px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 #greetingBadge {
   position: absolute;
-  left: 480px;
-  top: 38px;
-  font-size: 26px;
+  left: 490px;
+  top: 36px;
+  font-size: 27px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 0.2px;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 #clockModule {
   position: absolute;
   right: 80px;
   top: 22px;
-  text-align: right;
   display: -webkit-flex;
   display: flex;
   -webkit-align-items: center;
@@ -222,38 +243,39 @@ html, body {
 #wifiStatus {
   width: 32px;
   height: 32px;
-  margin-right: 28px;
-  opacity: 0.75;
+  margin-right: 24px;
+  opacity: 0.85;
 }
 
 #clockTime {
-  font-size: 52px;
+  font-size: 54px;
   font-weight: 300;
-  line-height: 52px;
+  line-height: 54px;
   color: #ffffff;
   letter-spacing: 0.5px;
-  margin-right: 20px;
+  margin-right: 22px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
 #clockDate {
   font-size: 20px;
   font-weight: 400;
-  line-height: 24px;
-  color: rgba(255, 255, 255, 0.6);
-  border-left: 1px solid rgba(255, 255, 255, 0.18);
-  padding-left: 18px;
+  line-height: 25px;
+  color: rgba(255, 255, 255, 0.65);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding-left: 20px;
   text-align: left;
 }
 
 /* ==========================================================================
-   Main Rows Container & Tracks
+   Rows Viewport & Track
    ========================================================================== */
 #rowsViewport {
   position: absolute;
   left: 0;
-  top: 110px;
+  top: 105px;
   width: 1920px;
-  height: 890px;
+  height: 895px;
   overflow: hidden;
   z-index: 5;
 }
@@ -261,8 +283,8 @@ html, body {
 #rowsTrack {
   position: relative;
   width: 1920px;
-  -webkit-transition: -webkit-transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
-  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  -webkit-transition: -webkit-transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .tvRow {
@@ -282,8 +304,9 @@ html, body {
   font-weight: 700;
   letter-spacing: 0.4px;
   color: #ffffff;
-  height: 42px;
-  line-height: 42px;
+  height: 40px;
+  line-height: 40px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 .itemsTrack {
@@ -296,7 +319,7 @@ html, body {
 }
 
 /* ==========================================================================
-   Card Items & Focus Ring (Liquid Glass Styling)
+   Liquid Glass Cards & Ultra-Clear High-Contrast Focus Ring
    ========================================================================== */
 .cardItem {
   position: relative;
@@ -306,10 +329,10 @@ html, body {
   border-radius: 22px;
   cursor: pointer;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-  -webkit-transition: -webkit-transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
-  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+  -webkit-transition: -webkit-transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
   overflow: visible;
 }
 
@@ -318,34 +341,34 @@ html, body {
   transform: scale(1.03);
 }
 
+/* HIGH-CONTRAST FOCUS RING (Clear & Unmistakable on 2016 Samsung TV) */
 .cardItem.focused {
   -webkit-transform: scale(1.09);
   transform: scale(1.09);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 35px rgba(130, 160, 255, 0.35);
+  border-color: #ffffff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 240, 255, 0.8), 0 0 60px rgba(121, 40, 202, 0.5);
   z-index: 10;
 }
 
-/* High-contrast TV Focus Ring */
 .focusRing {
   position: absolute;
-  left: -6px;
-  top: -6px;
-  right: -6px;
-  bottom: -6px;
+  left: -7px;
+  top: -7px;
+  right: -7px;
+  bottom: -7px;
   border: 5px solid #ffffff;
-  border-radius: 28px;
+  border-radius: 29px;
   opacity: 0;
   pointer-events: none;
   -webkit-transition: opacity 0.18s ease;
   transition: opacity 0.18s ease;
-  box-shadow: 0 0 18px rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 22px rgba(255, 255, 255, 0.9), inset 0 0 12px rgba(0, 240, 255, 0.5);
 }
 
 .cardItem.focused .focusRing {
   opacity: 1;
 }
 
-/* Glass shine surface */
 .cardFace {
   position: absolute;
   left: 0;
@@ -362,16 +385,16 @@ html, body {
   top: 0;
   right: 0;
   bottom: 0;
-  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 50%);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 50%);
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 50%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 50%);
   pointer-events: none;
 }
 
 /* ==========================================================================
-   Hero Row
+   Hero Spotlight Row
    ========================================================================== */
 .heroRow {
-  height: 450px;
+  height: 440px;
 }
 
 #heroBanner {
@@ -379,11 +402,11 @@ html, body {
   left: 80px;
   top: 10px;
   width: 1760px;
-  height: 410px;
+  height: 400px;
   border-radius: 32px;
-  background: rgba(18, 22, 38, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.45);
+  background: rgba(14, 18, 32, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6);
   overflow: hidden;
 }
 
@@ -393,15 +416,15 @@ html, body {
   top: 0;
   right: 0;
   bottom: 0;
-  background: -webkit-linear-gradient(top left, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%);
+  background: -webkit-linear-gradient(top left, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 60%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 60%);
   pointer-events: none;
 }
 
 #heroTextPane {
   position: absolute;
   left: 60px;
-  top: 40px;
+  top: 36px;
   width: 860px;
   z-index: 3;
   -webkit-transition: opacity 0.3s ease, -webkit-transform 0.3s ease;
@@ -417,30 +440,30 @@ html, body {
   display: inline-block;
   padding: 6px 16px;
   border-radius: 14px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  margin-bottom: 12px;
-  color: #ffffff;
+  background: rgba(0, 240, 255, 0.2);
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  color: #00f0ff;
+  margin-bottom: 10px;
 }
 
 #heroTitle {
-  font-size: 64px;
+  font-size: 62px;
   font-weight: 800;
-  line-height: 72px;
+  line-height: 70px;
   letter-spacing: -1px;
   margin: 0 0 10px 0;
   color: #ffffff;
-  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
 }
 
 #heroMeta {
   font-size: 22px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.75);
   margin-bottom: 14px;
 }
 
@@ -448,11 +471,11 @@ html, body {
   font-size: 24px;
   line-height: 36px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.88);
   width: 820px;
   height: 72px;
   overflow: hidden;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 #heroButtons {
@@ -462,12 +485,12 @@ html, body {
 
 .heroBtn {
   position: relative;
-  height: 64px;
-  line-height: 64px;
-  padding: 0 40px;
-  margin-right: 22px;
-  border-radius: 32px;
-  font-size: 26px;
+  height: 62px;
+  line-height: 62px;
+  padding: 0 38px;
+  margin-right: 20px;
+  border-radius: 31px;
+  font-size: 25px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
@@ -481,17 +504,17 @@ html, body {
 }
 #btnListHero {
   background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #ffffff;
 }
 
 .heroBtn.focused {
   -webkit-transform: scale(1.08);
   transform: scale(1.08);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 255, 255, 0.7);
 }
 .heroBtn .focusRing {
-  border-radius: 38px;
+  border-radius: 37px;
 }
 
 #heroArtPane {
@@ -499,7 +522,7 @@ html, body {
   right: 0;
   top: 0;
   width: 840px;
-  height: 410px;
+  height: 400px;
   overflow: hidden;
   -webkit-transition: opacity 0.3s ease;
   transition: opacity 0.3s ease;
@@ -514,20 +537,20 @@ html, body {
   top: 0;
   width: 100%;
   height: 100%;
-  background: -webkit-linear-gradient(left, rgba(18,22,38,1) 0%, rgba(18,22,38,0) 40%);
-  background: linear-gradient(90deg, rgba(18,22,38,1) 0%, rgba(18,22,38,0) 40%);
+  background: -webkit-linear-gradient(left, rgba(14,18,32,1) 0%, rgba(14,18,32,0) 40%);
+  background: linear-gradient(90deg, rgba(14,18,32,1) 0%, rgba(14,18,32,0) 40%);
   z-index: 2;
 }
 
 #heroArtVisual {
   position: absolute;
   right: 40px;
-  top: 35px;
+  top: 30px;
   width: 680px;
   height: 340px;
   border-radius: 26px;
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
 }
 
 .orbArt {
@@ -538,7 +561,7 @@ html, body {
 #heroDots {
   position: absolute;
   right: 80px;
-  bottom: 24px;
+  bottom: 22px;
   z-index: 4;
 }
 .heroDot {
@@ -557,7 +580,7 @@ html, body {
 }
 
 /* ==========================================================================
-   Apps Row
+   Apps Row (Samsung Direct App Launch Cards)
    ========================================================================== */
 .appCard {
   width: 250px;
@@ -577,7 +600,7 @@ html, body {
   align-items: center;
   -webkit-justify-content: center;
   justify-content: center;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
 }
 
 .appIconSvg {
@@ -595,25 +618,25 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
-.appUrlBadge {
+.appLaunchBadge {
   position: absolute;
   right: 18px;
   top: 22px;
   font-size: 13px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.45);
-  background: rgba(0, 0, 0, 0.3);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.45);
   padding: 3px 8px;
   border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* Add App special card */
 .addAppCard {
-  border: 2px dashed rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.04);
+  border: 2px dashed rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.05);
 }
 .addAppCard .appName {
   color: rgba(255, 255, 255, 0.85);
@@ -641,8 +664,8 @@ html, body {
   right: 0;
   bottom: 0;
   height: 140px;
-  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.85) 100%);
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.85) 100%);
+  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.88) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.88) 100%);
 }
 
 .watchPlayIcon {
@@ -652,8 +675,8 @@ html, body {
   width: 48px;
   height: 48px;
   border-radius: 24px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: -webkit-flex;
   display: flex;
   -webkit-align-items: center;
@@ -669,7 +692,7 @@ html, body {
   right: 20px;
   font-size: 28px;
   font-weight: 700;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -693,8 +716,8 @@ html, body {
 }
 .watchProgressFill {
   height: 6px;
-  background: #ffffff;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+  background: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.9);
 }
 
 /* ==========================================================================
@@ -718,7 +741,7 @@ html, body {
   align-items: center;
   -webkit-justify-content: center;
   justify-content: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .sysLabelWrap {
@@ -747,7 +770,7 @@ html, body {
 }
 
 /* ==========================================================================
-   Bottom Hints Bar & Remote Colour Shortcuts
+   Remote Hints Bar
    ========================================================================== */
 #bottomHintBar {
   position: absolute;
@@ -759,7 +782,7 @@ html, body {
   text-align: center;
   z-index: 10;
   font-size: 21px;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.7);
   pointer-events: auto;
 }
 
@@ -778,7 +801,7 @@ html, body {
   color: #ffffff;
   vertical-align: middle;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 .remotePill:hover {
   -webkit-transform: scale(1.08);
@@ -789,7 +812,7 @@ html, body {
 .pillGreen { background: #1db954; }
 .pillYellow { background: #f5a623; color: #000000; }
 .pillBlue { background: #0084ff; }
-.pillKey { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); }
+.pillKey { background: rgba(255, 255, 255, 0.22); border: 1px solid rgba(255, 255, 255, 0.35); }
 
 /* ==========================================================================
    Modals & Overlays (Liquid Glass Panels)
@@ -801,7 +824,7 @@ html, body {
   width: 1920px;
   height: 1080px;
   z-index: 100;
-  background: rgba(3, 5, 10, 0.88);
+  background: rgba(2, 4, 10, 0.92);
   display: none;
   opacity: 0;
   -webkit-transition: opacity 0.3s ease;
@@ -818,12 +841,12 @@ html, body {
   top: 50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  background: rgba(18, 24, 40, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(14, 18, 32, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 36px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(100, 140, 255, 0.25);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(0, 240, 255, 0.3);
   box-sizing: border-box;
-  padding: 44px 50px;
+  padding: 42px 48px;
   overflow: hidden;
 }
 
@@ -834,28 +857,28 @@ html, body {
   justify-content: space-between;
   -webkit-align-items: center;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  padding-bottom: 22px;
-  margin-bottom: 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  padding-bottom: 20px;
+  margin-bottom: 26px;
 }
 
 .dialogTitle {
-  font-size: 40px;
+  font-size: 38px;
   font-weight: 800;
   letter-spacing: -0.5px;
 }
 
 .dialogSubtitle {
   font-size: 20px;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.6);
   margin-top: 4px;
 }
 
 .dialogCloseBtn {
   padding: 12px 26px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   font-size: 22px;
   font-weight: 600;
   cursor: pointer;
@@ -867,8 +890,8 @@ html, body {
 
 /* Wallpaper Modal Specifics */
 #wallpaperModal .glassDialog {
-  width: 1460px;
-  height: 820px;
+  width: 1480px;
+  height: 830px;
 }
 
 #wallpaperGrid {
@@ -884,23 +907,23 @@ html, body {
 
 .wpThumbCard {
   position: relative;
-  width: 320px;
+  width: 322px;
   height: 180px;
   margin: 12px 14px;
   border-radius: 20px;
   cursor: pointer;
-  background-color: #121828;
+  background-color: #0c101c;
   -webkit-background-size: cover;
   background-size: cover;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
   -webkit-transition: -webkit-transform 0.2s ease, border-color 0.2s ease;
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .wpThumbCard.selected {
-  border-color: #6b52ff;
-  box-shadow: 0 0 25px rgba(107, 82, 255, 0.7);
+  border-color: #00f0ff;
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.8);
 }
 
 .wpThumbCard.selected:after {
@@ -908,9 +931,9 @@ html, body {
   position: absolute;
   top: 12px;
   right: 12px;
-  background: #6b52ff;
-  color: #ffffff;
-  font-size: 14px;
+  background: #00f0ff;
+  color: #000000;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 1.5px;
   padding: 4px 10px;
@@ -921,7 +944,7 @@ html, body {
   -webkit-transform: scale(1.08);
   transform: scale(1.08);
   border-color: #ffffff;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 255, 255, 0.9);
   z-index: 5;
 }
 
@@ -933,7 +956,7 @@ html, body {
   font-size: 21px;
   font-weight: 700;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.65);
   padding: 6px 12px;
   border-radius: 12px;
   white-space: nowrap;
@@ -957,30 +980,29 @@ html, body {
   cursor: pointer;
 }
 
-/* Custom wallpaper input row */
 .customWpRow {
   display: -webkit-flex;
   display: flex;
   -webkit-align-items: center;
   align-items: center;
   padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .modalInput {
   height: 58px;
   padding: 0 24px;
   border-radius: 18px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   color: #ffffff;
   font-size: 22px;
   box-sizing: border-box;
   outline: none;
 }
 .modalInput:focus, .modalInput.focused {
-  border-color: #8ef0f7;
-  box-shadow: 0 0 16px rgba(142, 240, 247, 0.5);
+  border-color: #00f0ff;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
 }
 
 .actionBtn {
@@ -1001,24 +1023,22 @@ html, body {
 .actionBtn:hover, .actionBtn.focused {
   -webkit-transform: scale(1.05);
   transform: scale(1.05);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 255, 255, 0.4);
 }
 
 .actionBtnPrimary {
-  background: -webkit-linear-gradient(left, #6b52ff, #9952ff);
-  background: linear-gradient(90deg, #6b52ff, #9952ff);
+  background: -webkit-linear-gradient(left, #00f0ff, #7928ca);
+  background: linear-gradient(90deg, #00f0ff, #7928ca);
 }
 .actionBtnSecondary {
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
 }
 .actionBtnDanger {
   background: #e50914;
 }
 
-/* ==========================================================================
-   App Editor Modal Specifics
-   ========================================================================== */
+/* App Editor Modal Specifics */
 #appEditorModal .glassDialog {
   width: 1560px;
   height: 840px;
@@ -1034,7 +1054,7 @@ html, body {
   width: 820px;
   height: 600px;
   overflow-y: auto;
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
   padding-right: 28px;
   box-sizing: border-box;
 }
@@ -1048,21 +1068,21 @@ html, body {
   padding: 14px 18px;
   margin-bottom: 12px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   cursor: pointer;
   -webkit-transition: background 0.2s ease, border-color 0.2s ease;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .appEditItem.selected {
-  background: rgba(107, 82, 255, 0.25);
-  border-color: #6b52ff;
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #00f0ff;
 }
 
 .appEditItem.focused {
   border-color: #ffffff;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
   -webkit-transform: scale(1.02);
   transform: scale(1.02);
 }
@@ -1071,7 +1091,7 @@ html, body {
   width: 36px;
   font-size: 22px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .appEditIcon {
@@ -1103,7 +1123,7 @@ html, body {
 
 .appEditUrl {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.55);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1120,7 +1140,7 @@ html, body {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   color: #ffffff;
   font-size: 20px;
   font-weight: 700;
@@ -1183,7 +1203,7 @@ html, body {
 }
 .colorOption.active {
   border-color: #ffffff;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.85);
   -webkit-transform: scale(1.15);
   transform: scale(1.15);
 }
@@ -1197,11 +1217,11 @@ html, body {
   -webkit-align-items: center;
   align-items: center;
   padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 /* ==========================================================================
-   App Launch Screen Overlay
+   Samsung App Launch Modal & Reality-Check Explanation
    ========================================================================== */
 #launchOverlay {
   position: absolute;
@@ -1210,7 +1230,7 @@ html, body {
   width: 1920px;
   height: 1080px;
   z-index: 120;
-  background: rgba(5, 7, 14, 0.96);
+  background: rgba(2, 4, 10, 0.94);
   display: none;
   opacity: 0;
   -webkit-transition: opacity 0.3s ease;
@@ -1228,48 +1248,56 @@ html, body {
 
 .launchBox {
   text-align: center;
-  max-width: 900px;
+  width: 1040px;
+  background: rgba(14, 18, 32, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 36px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 50px rgba(0, 240, 255, 0.3);
+  padding: 44px 50px;
+  box-sizing: border-box;
 }
 
 .launchBigIcon {
-  width: 180px;
-  height: 180px;
-  border-radius: 44px;
-  margin: 0 auto 36px auto;
+  width: 140px;
+  height: 140px;
+  border-radius: 36px;
+  margin: 0 auto 24px auto;
   display: -webkit-flex;
   display: flex;
   -webkit-align-items: center;
   align-items: center;
   -webkit-justify-content: center;
   justify-content: center;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
 }
 
 .launchAppName {
-  font-size: 58px;
+  font-size: 52px;
   font-weight: 800;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .launchAppSub {
-  font-size: 26px;
-  color: rgba(255, 255, 255, 0.65);
+  font-size: 24px;
+  color: #00f0ff;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.launchDetailsCard {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 20px 24px;
+  text-align: left;
   margin-bottom: 28px;
+  font-size: 19px;
+  line-height: 28px;
+  color: rgba(255, 255, 255, 0.85);
 }
-
-.launchSpinner {
-  width: 50px;
-  height: 50px;
-  margin: 0 auto 30px auto;
-  border: 5px solid rgba(255, 255, 255, 0.2);
-  border-top-color: #ffffff;
-  border-radius: 50%;
-  -webkit-animation: spinAnimation 0.85s linear infinite;
-  animation: spinAnimation 0.85s linear infinite;
+.launchDetailsCard b {
+  color: #ffffff;
 }
-
-@-webkit-keyframes spinAnimation { to { -webkit-transform: rotate(360deg); } }
-@keyframes spinAnimation { to { transform: rotate(360deg); } }
 
 .launchActions {
   display: -webkit-flex;
@@ -1279,24 +1307,24 @@ html, body {
 }
 
 /* ==========================================================================
-   Toast Notification
+   Toast Notification & Remote Quick Guide
    ========================================================================== */
 #toastBox {
   position: absolute;
   left: 50%;
-  bottom: 86px;
-  width: 660px;
-  margin-left: -330px;
-  padding: 18px 24px;
+  bottom: 80px;
+  width: 680px;
+  margin-left: -340px;
+  padding: 16px 24px;
   text-align: center;
   z-index: 150;
   border-radius: 28px;
-  background: rgba(24, 30, 48, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 26px;
+  background: rgba(20, 26, 44, 0.96);
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  font-size: 25px;
   font-weight: 600;
   color: #ffffff;
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 240, 255, 0.4);
   opacity: 0;
   -webkit-transform: translateY(24px);
   transform: translateY(24px);
@@ -1314,25 +1342,27 @@ html, body {
 <body>
 
 <div id="stage">
-  <!-- Dynamic Wallpapers & Ambiance -->
-  <div id="bgLayer"></div>
-  <div id="bgOverlay"></div>
-  <div id="glowCool"></div>
-  <div id="glowA" class="glowLayer"></div>
-  <div id="glowB" class="glowLayer"></div>
-  <div id="particlesContainer"></div>
+  <!-- Dynamic Wallpapers & Natural Fading Layers -->
+  <div id="bgContainer">
+    <div id="bgBase"></div>
+    <div id="bgAuraMesh"></div>
+    <div id="bgVignetteFade"></div>
+    <div id="bgSideVignette"></div>
+    <div id="dynamicAmbientGlow"></div>
+  </div>
+  <div id="particlesStage"></div>
 
   <!-- Top Navigation & System Status -->
   <div id="topBar">
     <div id="logoArea">
       <div id="logoOrb"></div>
       <div id="logoTitle">Aurora TV</div>
-      <div id="logoTag">Samsung Edition</div>
+      <div id="logoTag">Samsung LV32F390</div>
     </div>
     <div id="greetingBadge">Good Evening</div>
 
     <div id="clockModule">
-      <!-- Clean WiFi icon SVG -->
+      <!-- Clean TV WiFi Status Icon -->
       <svg id="wifiStatus" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 8.5C6.5 4.5 17.5 4.5 22 8.5"></path>
         <path d="M5.5 12C8.5 9 15.5 9 18.5 12"></path>
@@ -1364,8 +1394,8 @@ html, body {
           <div id="heroArtPane">
             <div id="heroArtGrad"></div>
             <div id="heroArtVisual" id="heroVisualBox">
-              <div class="orbArt" style="width:400px; height:400px; right:-80px; top:-80px; background:rgba(255,255,255,0.18);"></div>
-              <div class="orbArt" style="width:280px; height:280px; left:-60px; bottom:-60px; background:rgba(0,0,0,0.35);"></div>
+              <div class="orbArt" style="width:400px; height:400px; right:-80px; top:-80px; background:rgba(255,255,255,0.22);"></div>
+              <div class="orbArt" style="width:280px; height:280px; left:-60px; bottom:-60px; background:rgba(0,0,0,0.45);"></div>
             </div>
           </div>
           <div id="heroDots"></div>
@@ -1374,7 +1404,7 @@ html, body {
 
       <!-- Row 1: Apps Row -->
       <div class="tvRow" id="rowApps">
-        <div class="rowHeading">Your Apps</div>
+        <div class="rowHeading">Your Apps <span style="font-size:18px; font-weight:normal; color:rgba(255,255,255,0.5); margin-left:14px;">(Press 1-9 on remote for quick launch)</span></div>
         <div class="itemsTrack" id="appsTrack"></div>
       </div>
 
@@ -1395,7 +1425,7 @@ html, body {
   <!-- Remote Color Hint Bar -->
   <div id="bottomHintBar">
     <span class="remoteKeyHint"><span class="remotePill pillKey">&#9664; &#9650; &#9660; &#9654;</span> Navigate</span>
-    <span class="remoteKeyHint"><span class="remotePill pillKey">OK</span> Select</span>
+    <span class="remoteKeyHint"><span class="remotePill pillKey">OK</span> Launch</span>
     <span class="remoteKeyHint"><span class="remotePill pillKey">BACK</span> Return</span>
     <span class="remoteKeyHint" id="btnShortcutRed"><span class="remotePill pillRed">RED</span> Wallpapers</span>
     <span class="remoteKeyHint" id="btnShortcutGreen"><span class="remotePill pillGreen">GREEN</span> Edit Apps</span>
@@ -1408,8 +1438,8 @@ html, body {
     <div class="glassDialog">
       <div class="dialogHeader">
         <div>
-          <div class="dialogTitle">Select Wallpaper</div>
-          <div class="dialogSubtitle">Choose a built-in theme or supply a custom high-definition image URL</div>
+          <div class="dialogTitle">Select Vibrant Wallpaper</div>
+          <div class="dialogSubtitle">Vibrant electric colors smoothly melting into deep obsidian black (Press BLUE on remote anytime to cycle)</div>
         </div>
         <div class="dialogCloseBtn" id="btnCloseWpModal">Close (BACK)</div>
       </div>
@@ -1428,7 +1458,7 @@ html, body {
       <div class="dialogHeader">
         <div>
           <div class="dialogTitle">Edit Applications</div>
-          <div class="dialogSubtitle">Add shortcuts, change launch URLs, reorder or restore default applications</div>
+          <div class="dialogSubtitle">Customize application shortcuts, names, URLs, or reorder with &#9664; and &#9654;</div>
         </div>
         <div class="dialogCloseBtn" id="btnCloseAppModal">Close (BACK)</div>
       </div>
@@ -1441,7 +1471,7 @@ html, body {
             <input type="text" class="modalInput" id="appFormName" placeholder="e.g. Crunchyroll" style="width: 100%;">
           </div>
           <div class="formField">
-            <label class="formLabel">Launch URL</label>
+            <label class="formLabel">Launch Target / URL</label>
             <input type="text" class="modalInput" id="appFormUrl" placeholder="https://..." style="width: 100%;">
           </div>
           <div class="formField">
@@ -1456,20 +1486,29 @@ html, body {
       </div>
       <div class="editorBottomBar">
         <button class="actionBtn actionBtnDanger" id="btnRestoreDefaultApps">&#8635; Restore Default Apps</button>
-        <div style="color: rgba(255,255,255,0.5); font-size: 19px;">Remote buttons: Press OK on Move &#9664; / &#9654; to reorder apps</div>
+        <div style="color: rgba(255,255,255,0.5); font-size: 19px;">Remote: Use &#9664; / &#9654; buttons on list items to reorder</div>
       </div>
     </div>
   </div>
 
-  <!-- App Launch Confirmation Overlay -->
+  <!-- App Launch Modal with Samsung TV Launch Methods & Sandboxing Explanation -->
   <div id="launchOverlay">
     <div class="launchBox">
       <div class="launchBigIcon" id="launchIcon"></div>
       <div class="launchAppName" id="launchName">YouTube</div>
-      <div class="launchAppSub" id="launchSub">Opening application&hellip;</div>
-      <div class="launchSpinner"></div>
+      <div class="launchAppSub" id="launchSub">Executing Samsung Tizen Launch&hellip;</div>
+
+      <div class="launchDetailsCard" id="launchExplanationCard">
+        <b>Samsung TV App Launcher (Tizen 2.4):</b><br>
+        <span id="launchTechnicalDetail">Invoking native Tizen App Control &amp; TV URI protocol handler...</span><br><br>
+        <div id="launchSandboxWarning" style="font-size: 17px; color: #ffd600; line-height: 24px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px;">
+          <b>Note regarding Samsung TV Browser:</b> Webpages visited inside the built-in Samsung Internet Browser run in a sandbox. If your TV firmware prevents the browser from switching directly to the native app, select <b>Open TV Interface</b> below for the full-screen 10-foot TV experience.
+        </div>
+      </div>
+
       <div class="launchActions">
-        <button class="actionBtn actionBtnPrimary" id="btnLaunchNow" style="margin-right: 18px;">Open Now</button>
+        <button class="actionBtn actionBtnPrimary focused" id="btnLaunchNow" style="margin-right: 18px;">Open TV Interface (OK)</button>
+        <button class="actionBtn actionBtnSecondary" id="btnLaunchUri" style="margin-right: 18px;">Try Native Scheme</button>
         <button class="actionBtn actionBtnSecondary" id="btnLaunchCancel">Cancel (BACK)</button>
       </div>
     </div>
@@ -1482,7 +1521,7 @@ html, body {
 <script>
 /* ==========================================================================
    Aurora TV Samsung Edition
-   Target: Samsung 2016 Smart TV (ES5 ONLY, No let/const, No arrow functions)
+   Target: Samsung LV32F390 (T-KTSDEUC-1410.1 / Tizen 2.4 / WebKit / ES5 ONLY)
    ========================================================================== */
 (function () {
   "use strict";
@@ -1509,68 +1548,175 @@ html, body {
     sparkles: '<path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5zM19 15l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z" stroke="#fff" stroke-width="1.6" fill="none"></path>'
   };
 
-  /* ---------- Default Data Models ---------- */
+  /* ---------- Colourful Fading Wallpapers (Vibrant Gradients into Black) ---------- */
   var DEFAULT_WALLPAPERS = [
     {
-      id: "aurora",
-      name: "Aurora Borealis",
+      id: "liquid_aurora",
+      name: "Liquid Aurora",
       type: "gradient",
-      css: "linear-gradient(135deg, #091a28 0%, #050b18 50%, #0e2b26 100%)",
-      c1: "#1de9b6",
-      c2: "#0d47a1"
+      c1: "#00f0ff",
+      c2: "#7928ca",
+      gradient: "radial-gradient(circle at 18% 18%, rgba(0, 240, 255, 0.55) 0%, rgba(0, 112, 243, 0.3) 30%, rgba(0,0,0,0) 65%), " +
+                "radial-gradient(circle at 82% 22%, rgba(255, 0, 128, 0.52) 0%, rgba(121, 40, 202, 0.35) 35%, rgba(0,0,0,0) 65%), " +
+                "radial-gradient(circle at 50% 45%, rgba(121, 40, 202, 0.45) 0%, rgba(0,0,0,0) 60%), " +
+                "radial-gradient(circle at 75% 80%, rgba(0, 112, 243, 0.35) 0%, rgba(0,0,0,0) 55%), " +
+                "radial-gradient(circle at 25% 75%, rgba(255, 46, 147, 0.35) 0%, rgba(0,0,0,0) 55%)"
     },
     {
-      id: "midnight",
-      name: "Midnight Eclipse",
+      id: "cyber_twilight",
+      name: "Cyber Twilight",
       type: "gradient",
-      css: "linear-gradient(145deg, #0f1226 0%, #060810 55%, #180928 100%)",
-      c1: "#7c4dff",
-      c2: "#1a237e"
+      c1: "#ff007f",
+      c2: "#7b2cbf",
+      gradient: "radial-gradient(circle at 20% 25%, rgba(255, 0, 127, 0.6) 0%, rgba(123, 44, 191, 0.35) 35%, rgba(0,0,0,0) 65%), " +
+                "radial-gradient(circle at 80% 20%, rgba(0, 229, 255, 0.5) 0%, rgba(49, 27, 146, 0.4) 35%, rgba(0,0,0,0) 65%), " +
+                "radial-gradient(circle at 50% 50%, rgba(255, 61, 0, 0.35) 0%, rgba(0,0,0,0) 60%), " +
+                "radial-gradient(circle at 20% 80%, rgba(123, 44, 191, 0.4) 0%, rgba(0,0,0,0) 55%)"
     },
     {
-      id: "violet",
-      name: "Liquid Violet",
+      id: "electric_ocean",
+      name: "Electric Ocean",
       type: "gradient",
-      css: "linear-gradient(140deg, #1b0a2a 0%, #090614 55%, #2a0b18 100%)",
-      c1: "#e040fb",
-      c2: "#4a148c"
-    },
-    {
-      id: "cyber",
-      name: "Cyber Horizon",
-      type: "gradient",
-      css: "linear-gradient(135deg, #0a1f33 0%, #060d1a 50%, #1f1430 100%)",
       c1: "#00e5ff",
-      c2: "#ff3d00"
+      c2: "#0051ff",
+      gradient: "radial-gradient(circle at 25% 20%, rgba(0, 229, 255, 0.55) 0%, rgba(0, 113, 243, 0.35) 35%, rgba(0,0,0,0) 65%), " +
+                "radial-gradient(circle at 75% 25%, rgba(5, 255, 161, 0.45) 0%, rgba(13, 71, 161, 0.4) 35%, rgba(0,0,0,0) 65%), " +
+                "radial-gradient(circle at 50% 50%, rgba(123, 44, 191, 0.35) 0%, rgba(0,0,0,0) 60%), " +
+                "radial-gradient(circle at 80% 80%, rgba(0, 229, 255, 0.3) 0%, rgba(0,0,0,0) 55%)"
     },
     {
-      id: "nebula",
-      name: "Cosmic Nebula",
+      id: "neon_orchid",
+      name: "Neon Orchid",
       type: "gradient",
-      css: "linear-gradient(150deg, #1f0d24 0%, #090912 50%, #091a2d 100%)",
-      c1: "#ff4081",
-      c2: "#304ffe"
+      c1: "#f72585",
+      c2: "#7209b7",
+      gradient: "radial-gradient(circle at 20% 20%, rgba(247, 37, 133, 0.58) 0%, rgba(114, 9, 183, 0.35) 35%, rgba(0,0,0,0) 65%), " +
+                "radial-gradient(circle at 80% 25%, rgba(67, 97, 238, 0.5) 0%, rgba(76, 201, 240, 0.3) 35%, rgba(0,0,0,0) 65%), " +
+                "radial-gradient(circle at 50% 45%, rgba(181, 23, 158, 0.4) 0%, rgba(0,0,0,0) 60%)"
     },
     {
-      id: "oled",
-      name: "OLED Stealth Black",
+      id: "solar_flare",
+      name: "Solar Nebula",
       type: "gradient",
-      css: "linear-gradient(180deg, #000000 0%, #080808 100%)",
-      c1: "#607d8b",
-      c2: "#263238"
+      c1: "#ff5964",
+      c2: "#ff9e00",
+      gradient: "radial-gradient(circle at 25% 20%, rgba(255, 89, 100, 0.55) 0%, rgba(157, 2, 8, 0.35) 35%, rgba(0,0,0,0) 65%), " +
+                "radial-gradient(circle at 75% 25%, rgba(255, 158, 0, 0.5) 0%, rgba(249, 199, 79, 0.3) 35%, rgba(0,0,0,0) 65%), " +
+                "radial-gradient(circle at 50% 50%, rgba(121, 40, 202, 0.35) 0%, rgba(0,0,0,0) 60%)"
+    },
+    {
+      id: "deep_space",
+      name: "Deep Space Void",
+      type: "gradient",
+      c1: "#0070f3",
+      c2: "#1a1f35",
+      gradient: "radial-gradient(circle at 20% 25%, rgba(0, 112, 243, 0.35) 0%, rgba(0,0,0,0) 60%), " +
+                "radial-gradient(circle at 80% 20%, rgba(121, 40, 202, 0.3) 0%, rgba(0,0,0,0) 60%), " +
+                "radial-gradient(circle at 50% 80%, rgba(0, 240, 255, 0.2) 0%, rgba(0,0,0,0) 55%)"
     }
   ];
 
+  /* ---------- Default Installed TV Applications with Samsung Tizen IDs & URL Schemes ---------- */
   var DEFAULT_APPS = [
-    { id: "yt", name: "YouTube", icon: "youtube", url: "https://www.youtube.com/tv", c1: "#e50914", c2: "#8a0000" },
-    { id: "nf", name: "Netflix", icon: "netflix", url: "https://www.netflix.com", c1: "#e50914", c2: "#3d0305" },
-    { id: "pv", name: "Prime Video", icon: "prime", url: "https://www.primevideo.com", c1: "#00a8e1", c2: "#003254" },
-    { id: "dp", name: "Disney+", icon: "disney", url: "https://www.disneyplus.com", c1: "#113ccf", c2: "#09173d" },
-    { id: "bbc", name: "BBC iPlayer", icon: "bbc", url: "https://www.bbc.co.uk/iplayer", c1: "#f54997", c2: "#780b39" },
-    { id: "tw", name: "Twitch", icon: "twitch", url: "https://www.twitch.tv", c1: "#9146ff", c2: "#3f1082" },
-    { id: "sp", name: "Spotify", icon: "spotify", url: "https://open.spotify.com", c1: "#1db954", c2: "#0e4f24" },
-    { id: "px", name: "Plex", icon: "plex", url: "https://app.plex.tv", c1: "#e5a00d", c2: "#694200" },
-    { id: "wb", name: "Web Browser", icon: "browser", url: "https://www.google.com", c1: "#4285f4", c2: "#174ea6" }
+    {
+      id: "yt",
+      name: "YouTube",
+      icon: "youtube",
+      url: "https://www.youtube.com/tv",
+      scheme: "youtube://",
+      tizenId: "111299001912",
+      tizenPackage: "org.tizen.youtube",
+      c1: "#e50914",
+      c2: "#8a0000"
+    },
+    {
+      id: "nf",
+      name: "Netflix",
+      icon: "netflix",
+      url: "https://www.netflix.com",
+      scheme: "netflix://",
+      tizenId: "11101200001",
+      tizenPackage: "org.tizen.netflix-box",
+      c1: "#e50914",
+      c2: "#3d0305"
+    },
+    {
+      id: "pv",
+      name: "Prime Video",
+      icon: "prime",
+      url: "https://www.primevideo.com",
+      scheme: "primevideo://",
+      tizenId: "3201512006785",
+      tizenPackage: "org.tizen.primevideo",
+      c1: "#00a8e1",
+      c2: "#003254"
+    },
+    {
+      id: "dp",
+      name: "Disney+",
+      icon: "disney",
+      url: "https://www.disneyplus.com",
+      scheme: "disneyplus://",
+      tizenId: "3201907018807",
+      tizenPackage: "org.tizen.disneyplus",
+      c1: "#113ccf",
+      c2: "#09173d"
+    },
+    {
+      id: "bbc",
+      name: "BBC iPlayer",
+      icon: "bbc",
+      url: "https://www.bbc.co.uk/iplayer",
+      scheme: "bbciplayer://",
+      tizenId: "111399000192",
+      tizenPackage: "3201601007250",
+      c1: "#f54997",
+      c2: "#780b39"
+    },
+    {
+      id: "tw",
+      name: "Twitch",
+      icon: "twitch",
+      url: "https://www.twitch.tv",
+      scheme: "twitch://",
+      tizenId: "3201606009684",
+      tizenPackage: "org.tizen.twitch",
+      c1: "#9146ff",
+      c2: "#3f1082"
+    },
+    {
+      id: "sp",
+      name: "Spotify",
+      icon: "spotify",
+      url: "https://open.spotify.com",
+      scheme: "spotify://",
+      tizenId: "3201606009684",
+      tizenPackage: "org.tizen.spotify",
+      c1: "#1db954",
+      c2: "#0e4f24"
+    },
+    {
+      id: "px",
+      name: "Plex",
+      icon: "plex",
+      url: "https://app.plex.tv/desktop",
+      scheme: "plex://",
+      tizenId: "3201512006963",
+      tizenPackage: "org.tizen.plex",
+      c1: "#e5a00d",
+      c2: "#694200"
+    },
+    {
+      id: "wb",
+      name: "Web Browser",
+      icon: "browser",
+      url: "https://www.google.com",
+      scheme: "browser://",
+      tizenId: "org.tizen.browser",
+      tizenPackage: "org.tizen.browser",
+      c1: "#4285f4",
+      c2: "#174ea6"
+    }
   ];
 
   var HERO_ITEMS = [
@@ -1579,43 +1725,43 @@ html, body {
       title: "Midnight Harbor",
       meta: "Drama &bull; 2026 &bull; 4K HDR &bull; Season 2",
       desc: "When a beacon in the outer fog flashes a forbidden code, an isolated coastal town is drawn into a high-stakes maritime conspiracy.",
-      c1: "#ff5252",
-      c2: "#311b92"
+      c1: "#ff007f",
+      c2: "#7928ca"
     },
     {
       badge: "FEATURE FILM",
       title: "The Long Orbit",
       meta: "Sci-Fi &bull; 2026 &bull; 2h 12m &bull; Dolby Atmos",
       desc: "Two deep-space engineers make a perilous journey back to Earth after their orbital tether experiences sudden atmospheric drag.",
-      c1: "#00e5ff",
-      c2: "#0d47a1"
+      c1: "#00f0ff",
+      c2: "#0051ff"
     },
     {
       badge: "DOCUMENTARY",
       title: "Wild Aurora",
       meta: "Nature &bull; 2025 &bull; 6 Episodes &bull; Ultra HD",
       desc: "Witness the majestic sub-zero wildlife living under the world's most vibrant polar geomagnetic displays.",
-      c1: "#69f0ae",
-      c2: "#004d40"
+      c1: "#00f5d4",
+      c2: "#0077b6"
     }
   ];
 
   var WATCH_ITEMS = [
-    { title: "Midnight Harbor", sub: "S2 &bull; E3 &bull; 28m left", pct: 68, c1: "#ff5252", c2: "#311b92" },
-    { title: "The Long Orbit", sub: "Movie &bull; 1h 04m left", pct: 45, c1: "#00e5ff", c2: "#0d47a1" },
+    { title: "Midnight Harbor", sub: "S2 &bull; E3 &bull; 28m left", pct: 68, c1: "#ff007f", c2: "#7928ca" },
+    { title: "The Long Orbit", sub: "Movie &bull; 1h 04m left", pct: 45, c1: "#00f0ff", c2: "#0051ff" },
     { title: "Neon Cyberpunk", sub: "S1 &bull; E5 &bull; 14m left", pct: 82, c1: "#e040fb", c2: "#4a148c" },
-    { title: "Wild Aurora", sub: "E1 &bull; 42m left", pct: 20, c1: "#69f0ae", c2: "#004d40" },
+    { title: "Wild Aurora", sub: "E1 &bull; 42m left", pct: 20, c1: "#00f5d4", c2: "#0077b6" },
     { title: "Deep Sea Frontiers", sub: "S1 &bull; E2 &bull; 35m left", pct: 54, c1: "#00b0ff", c2: "#002171" },
     { title: "Solar Storms", sub: "Film &bull; 1h 22m left", pct: 10, c1: "#ffd600", c2: "#e65100" }
   ];
 
   var SYSTEM_ITEMS = [
-    { id: "hdmi1", name: "HDMI 1", sub: "Game Console", icon: "hdmi", c1: "#00e5ff", c2: "#005b96" },
-    { id: "hdmi2", name: "HDMI 2", sub: "Set-top Box", icon: "hdmi", c1: "#69f0ae", c2: "#0b6623" },
+    { id: "hdmi1", name: "HDMI 1", sub: "Game Console", icon: "hdmi", c1: "#00f0ff", c2: "#0051ff" },
+    { id: "hdmi2", name: "HDMI 2", sub: "Set-top Box", icon: "hdmi", c1: "#00f5d4", c2: "#0e4f24" },
     { id: "mirror", name: "Mirroring", sub: "Screen Cast", icon: "cast", c1: "#e040fb", c2: "#6a0080" },
     { id: "picture", name: "Picture", sub: "Cinema Mode", icon: "picture", c1: "#ffd600", c2: "#b26a00" },
     { id: "sound", name: "Sound", sub: "Stereo DTS", icon: "sound", c1: "#7c4dff", c2: "#303f9f" },
-    { id: "wallpaper", name: "Wallpapers", sub: "Change Look", icon: "palette", c1: "#ff4081", c2: "#c51162" },
+    { id: "wallpaper", name: "Wallpapers", sub: "Change Look", icon: "palette", c1: "#ff007f", c2: "#c51162" },
     { id: "editapps", name: "Edit Apps", sub: "Customize", icon: "edit", c1: "#00e676", c2: "#1b5e20" },
     { id: "effects", name: "Effects", sub: "Toggle Ambiance", icon: "sparkles", c1: "#ffab00", c2: "#ff6f00" }
   ];
@@ -1627,17 +1773,16 @@ html, body {
     { c1: "#9146ff", c2: "#3f1082" },
     { c1: "#1db954", c2: "#0e4f24" },
     { c1: "#e5a00d", c2: "#694200" },
-    { c1: "#ff4081", c2: "#c51162" },
-    { c1: "#00e5ff", c2: "#0d47a1" }
+    { c1: "#ff007f", c2: "#7928ca" },
+    { c1: "#00f0ff", c2: "#0051ff" }
   ];
 
   /* ---------- DOM Element Cache ---------- */
   function $(id) { return document.getElementById(id); }
 
   var stage = $("stage");
-  var bgLayer = $("bgLayer");
-  var glowA = $("glowA");
-  var glowB = $("glowB");
+  var bgAuraMesh = $("bgAuraMesh");
+  var dynamicAmbientGlow = $("dynamicAmbientGlow");
   var rowsTrack = $("rowsTrack");
   var appsTrack = $("appsTrack");
   var watchTrack = $("watchTrack");
@@ -1648,18 +1793,12 @@ html, body {
   /* ---------- State ---------- */
   var userApps = [];
   var userWallpapers = [];
-  var currentWallpaperId = "aurora";
+  var currentWallpaperId = "liquid_aurora";
   var effectsEnabled = true;
   var heroIndex = 0;
   var heroTimer = null;
-  var currentGlowFlip = 0;
-  var lastGlowColor = "";
 
-  // Navigation Grid State
-  // row 0: Hero buttons (Play, My List)
-  // row 1: Apps
-  // row 2: Continue Watching
-  // row 3: Settings
+  // Grid Navigation State (0: Hero, 1: Apps, 2: Watch, 3: Settings)
   var nav = {
     row: 0,
     col: 0,
@@ -1667,9 +1806,9 @@ html, body {
     modalIndex: 0
   };
 
-  var rowItems = [[], [], [], []]; // Cached item elements
+  var rowItems = [[], [], [], []];
 
-  /* ---------- Viewport Auto-Scaling (Fit to 1920x1080) ---------- */
+  /* ---------- Viewport Auto-Scaling (1920x1080 stage) ---------- */
   function fitStage() {
     var winW = window.innerWidth || document.documentElement.clientWidth || 1920;
     var winH = window.innerHeight || document.documentElement.clientHeight || 1080;
@@ -1704,7 +1843,7 @@ html, body {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () {
       toastBox.className = "";
-    }, 2400);
+    }, 2800);
   }
 
   function hexToRgba(hex, alpha) {
@@ -1744,29 +1883,21 @@ html, body {
   updateClock();
   setInterval(updateClock, 10000);
 
-  /* ---------- Ambient Glow Cross-fader ---------- */
+  /* ---------- Ambient Glow Spot ---------- */
   function setAmbientGlow(color) {
-    if (!effectsEnabled || !color || color === lastGlowColor) { return; }
-    lastGlowColor = color;
-    var glows = [glowA, glowB];
-    var current = glows[currentGlowFlip];
-    var other = glows[1 - currentGlowFlip];
-
-    var radialCss = "radial-gradient(ellipse at center, " + hexToRgba(color, 0.45) + " 0%, rgba(0,0,0,0) 70%)";
-    current.style.background = "-webkit-" + radialCss;
-    current.style.background = radialCss;
-    current.className = "glowLayer on";
-    other.className = "glowLayer";
-    currentGlowFlip = 1 - currentGlowFlip;
+    if (!effectsEnabled || !color) { return; }
+    var radialCss = "radial-gradient(ellipse at center, " + hexToRgba(color, 0.5) + " 0%, rgba(0,0,0,0) 68%)";
+    dynamicAmbientGlow.style.background = "-webkit-" + radialCss;
+    dynamicAmbientGlow.style.background = radialCss;
   }
 
   /* ---------- Floating Particles Generator ---------- */
   function setupParticles() {
-    var container = $("particlesContainer");
+    var container = $("particlesStage");
     container.innerHTML = "";
     for (var i = 0; i < 16; i++) {
       var p = document.createElement("div");
-      p.className = "particle";
+      p.className = "tvParticle";
       var size = Math.floor(Math.random() * 5) + 3;
       p.style.width = size + "px";
       p.style.height = size + "px";
@@ -1774,8 +1905,8 @@ html, body {
       p.style.top = Math.floor(Math.random() * 1060) + "px";
       p.style.webkitAnimationDelay = (Math.random() * 12).toFixed(1) + "s";
       p.style.animationDelay = (Math.random() * 12).toFixed(1) + "s";
-      p.style.webkitAnimationDuration = (10 + Math.random() * 12).toFixed(1) + "s";
-      p.style.animationDuration = (10 + Math.random() * 12).toFixed(1) + "s";
+      p.style.webkitAnimationDuration = (11 + Math.random() * 10).toFixed(1) + "s";
+      p.style.animationDuration = (11 + Math.random() * 10).toFixed(1) + "s";
       container.appendChild(p);
     }
   }
@@ -1787,16 +1918,17 @@ html, body {
     } catch (e) {}
     $("effectsStateLabel").innerHTML = on ? "On" : "Off";
     if (on) {
-      $("particlesContainer").className = "";
+      $("particlesStage").className = "";
+      bgAuraMesh.style.display = "block";
+      dynamicAmbientGlow.style.display = "block";
       setAmbientGlow(HERO_ITEMS[heroIndex].c1);
     } else {
-      $("particlesContainer").className = "disabled";
-      glowA.className = "glowLayer";
-      glowB.className = "glowLayer";
+      $("particlesStage").className = "hidden";
+      dynamicAmbientGlow.style.display = "none";
     }
   }
 
-  /* ---------- Wallpaper System ---------- */
+  /* ---------- Colourful Wallpapers Engine ---------- */
   function loadWallpaperState() {
     try {
       var savedId = localStorage.getItem("aurora_wallpaper_id");
@@ -1842,9 +1974,10 @@ html, body {
     } catch (e) {}
 
     if (found.type === "image") {
-      bgLayer.style.background = "url('" + found.url + "') center center / cover no-repeat";
+      bgAuraMesh.style.background = "url('" + found.url + "') center center / cover no-repeat";
     } else {
-      bgLayer.style.background = found.css;
+      bgAuraMesh.style.background = "-webkit-" + found.gradient;
+      bgAuraMesh.style.background = found.gradient;
     }
     setAmbientGlow(found.c1);
   }
@@ -1903,12 +2036,16 @@ html, body {
 
       var iconWrap = document.createElement("div");
       iconWrap.className = "appIconWrap";
-      iconWrap.style.background = "rgba(0,0,0,0.25)";
+      iconWrap.style.background = "rgba(0,0,0,0.3)";
       iconWrap.innerHTML = getSvg(app.icon);
 
       var nameEl = document.createElement("div");
       nameEl.className = "appName";
       nameEl.innerHTML = app.name;
+
+      var badge = document.createElement("div");
+      badge.className = "appLaunchBadge";
+      badge.innerHTML = "" + (i + 1);
 
       var ring = document.createElement("div");
       ring.className = "focusRing";
@@ -1916,6 +2053,7 @@ html, body {
       card.appendChild(face);
       card.appendChild(iconWrap);
       card.appendChild(nameEl);
+      card.appendChild(badge);
       card.appendChild(ring);
 
       (function (appObj, index) {
@@ -1934,7 +2072,7 @@ html, body {
       });
     }
 
-    // Special Add App card at the end of the row
+    // Special "+ Add App" card at the end of the row
     var addCard = document.createElement("div");
     addCard.className = "cardItem appCard addAppCard";
     addCard.setAttribute("data-row", "1");
@@ -1966,7 +2104,7 @@ html, body {
       el: addCard,
       type: "addApp",
       data: null,
-      color: "#6b52ff"
+      color: "#00f0ff"
     });
   }
 
@@ -2167,7 +2305,6 @@ html, body {
 
   /* ---------- Navigation & Focus Engine ---------- */
   function updateNavigationTargets() {
-    // Clamps column index if list changed
     if (nav.col >= rowItems[nav.row].length) {
       nav.col = Math.max(0, rowItems[nav.row].length - 1);
     }
@@ -2245,7 +2382,7 @@ html, body {
     } else if (cur.type === "heroList") {
       showToast("Added \"" + HERO_ITEMS[heroIndex].title + "\" to My List");
     } else if (cur.type === "app") {
-      openLaunchOverlay(cur.data);
+      launchApplicationTarget(cur.data);
     } else if (cur.type === "addApp") {
       openAppEditorModal();
     } else if (cur.type === "watch") {
@@ -2281,50 +2418,93 @@ html, body {
     }
   }
 
-  /* ---------- App Launch Overlay ---------- */
-  var launchCountdownTimer = null;
+  /* ---------- Samsung TV App Launcher Engine ---------- */
   var launchTargetApp = null;
+
+  function launchApplicationTarget(app) {
+    launchTargetApp = app;
+
+    // STEP 1: Attempt direct Samsung Tizen OS Native Launch
+    // If Aurora TV is running with Tizen API access (or as installed widget)
+    var nativeLaunched = false;
+    if (window.tizen && window.tizen.application && typeof window.tizen.application.launch === "function" && app.tizenId) {
+      try {
+        window.tizen.application.launch(app.tizenId, function () {
+          nativeLaunched = true;
+          showToast("Launching " + app.name + " via Samsung Tizen OS...");
+        }, function (err) {
+          // Native launch failed or restricted by sandbox
+          openLaunchOverlay(app);
+        });
+        if (nativeLaunched) { return; }
+      } catch (err) {
+        // Tizen API threw SecurityError in unprivileged browser context
+      }
+    }
+
+    // STEP 2: Open informative launch modal explaining the exact launch mechanism
+    openLaunchOverlay(app);
+  }
 
   function openLaunchOverlay(app) {
     launchTargetApp = app;
     nav.modal = "launch";
 
     $("launchName").innerHTML = app.name;
-    $("launchSub").innerHTML = app.sub || "Connecting to " + (app.url || app.name) + "...";
-    setGradient($("launchIcon"), app.c1 || "#6b52ff", app.c2 || "#1a237e");
+    $("launchSub").innerHTML = "Samsung TV Launch Handler";
+    setGradient($("launchIcon"), app.c1 || "#00f0ff", app.c2 || "#7928ca");
     $("launchIcon").innerHTML = getSvg(app.icon || "play");
+
+    var detailText = "Target App ID: <b>" + (app.tizenId || "N/A") + "</b><br>" +
+                     "URI Protocol: <b>" + (app.scheme || "N/A") + "</b><br>" +
+                     "Optimized TV Interface: <b>" + (app.url || "N/A") + "</b>";
+    $("launchTechnicalDetail").innerHTML = detailText;
 
     $("launchOverlay").className = "active";
     $("btnLaunchNow").className = "actionBtn actionBtnPrimary focused";
+    $("btnLaunchUri").className = "actionBtn actionBtnSecondary";
     $("btnLaunchCancel").className = "actionBtn actionBtnSecondary";
-
-    // Auto-launch timer
-    clearTimeout(launchCountdownTimer);
-    launchCountdownTimer = setTimeout(function () {
-      executeLaunch();
-    }, 2500);
   }
 
-  function executeLaunch() {
-    clearTimeout(launchCountdownTimer);
-    if (launchTargetApp && launchTargetApp.url && launchTargetApp.url.indexOf("http") === 0) {
-      showToast("Opening " + launchTargetApp.name + "...");
+  function executeOpenTvInterface() {
+    if (launchTargetApp && launchTargetApp.url) {
+      showToast("Opening 10-foot TV interface for " + launchTargetApp.name + "...");
       setTimeout(function () {
         window.location.href = launchTargetApp.url;
-      }, 500);
+      }, 400);
     } else {
-      showToast("Launching " + (launchTargetApp ? launchTargetApp.name : "App"));
       closeLaunchOverlay();
     }
   }
 
+  function executeTryNativeUriScheme() {
+    if (!launchTargetApp || !launchTargetApp.scheme) {
+      showToast("No native URI registered for this application");
+      return;
+    }
+
+    showToast("Triggering native protocol: " + launchTargetApp.scheme);
+    try {
+      var hiddenFrame = $("samsungProtocolFrame");
+      if (!hiddenFrame) {
+        hiddenFrame = document.createElement("iframe");
+        hiddenFrame.id = "samsungProtocolFrame";
+        hiddenFrame.style.display = "none";
+        document.body.appendChild(hiddenFrame);
+      }
+      hiddenFrame.src = launchTargetApp.scheme;
+    } catch (e) {
+      window.location.href = launchTargetApp.scheme;
+    }
+  }
+
   function closeLaunchOverlay() {
-    clearTimeout(launchCountdownTimer);
     $("launchOverlay").className = "";
     nav.modal = null;
   }
 
-  $("btnLaunchNow").onclick = executeLaunch;
+  $("btnLaunchNow").onclick = executeOpenTvInterface;
+  $("btnLaunchUri").onclick = executeTryNativeUriScheme;
   $("btnLaunchCancel").onclick = closeLaunchOverlay;
 
   /* ---------- Wallpaper Modal Engine ---------- */
@@ -2354,7 +2534,8 @@ html, body {
       if (wp.type === "image") {
         card.style.background = "url('" + wp.url + "') center center / cover no-repeat";
       } else {
-        card.style.background = wp.css;
+        card.style.background = "-webkit-" + wp.gradient;
+        card.style.background = wp.gradient;
       }
 
       var nameBadge = document.createElement("div");
@@ -2362,7 +2543,7 @@ html, body {
       nameBadge.innerHTML = wp.name;
       card.appendChild(nameBadge);
 
-      // Delete custom wallpaper button
+      // Custom wallpaper delete button
       if (wp.custom) {
         var delBtn = document.createElement("div");
         delBtn.className = "wpDeleteBtn";
@@ -2381,7 +2562,7 @@ html, body {
         card.onclick = function () {
           applyWallpaper(wpItem.id);
           renderWallpaperGrid();
-          showToast("Wallpaper applied: " + wpItem.name);
+          showToast("Applied: " + wpItem.name);
         };
       })(wp, i);
 
@@ -2425,7 +2606,7 @@ html, body {
     var url = $("customWpInput").value.trim();
     var name = $("customWpNameInput").value.trim() || "Custom Image";
     if (!url) {
-      showToast("Please enter a valid image URL");
+      showToast("Please enter an image URL");
       return;
     }
     var newWp = {
@@ -2433,8 +2614,8 @@ html, body {
       name: name,
       type: "image",
       url: url,
-      c1: "#6b52ff",
-      c2: "#1a237e",
+      c1: "#00f0ff",
+      c2: "#7928ca",
       custom: true
     };
     userWallpapers.push(newWp);
@@ -2445,7 +2626,7 @@ html, body {
     $("customWpNameInput").value = "";
     applyWallpaper(newWp.id);
     renderWallpaperGrid();
-    showToast("Added custom wallpaper: " + name);
+    showToast("Added wallpaper: " + name);
   };
 
   $("btnCloseWpModal").onclick = closeWallpaperModal;
@@ -2513,14 +2694,14 @@ html, body {
       name.innerHTML = app.name;
       var url = document.createElement("div");
       url.className = "appEditUrl";
-      url.innerHTML = app.url || "No launch URL";
+      url.innerHTML = app.url || app.scheme || "No launch target";
       details.appendChild(name);
       details.appendChild(url);
 
       var controls = document.createElement("div");
       controls.className = "appEditControls";
 
-      // Move Left
+      // Move Left button
       var btnLeft = document.createElement("button");
       btnLeft.className = "miniBtn";
       btnLeft.innerHTML = "&#9664;";
@@ -2532,7 +2713,7 @@ html, body {
         };
       })(i);
 
-      // Move Right
+      // Move Right button
       var btnRight = document.createElement("button");
       btnRight.className = "miniBtn";
       btnRight.innerHTML = "&#9654;";
@@ -2544,7 +2725,7 @@ html, body {
         };
       })(i);
 
-      // Delete
+      // Delete button
       var btnDelete = document.createElement("button");
       btnDelete.className = "miniBtn miniBtnDanger";
       btnDelete.innerHTML = "&times;";
@@ -2565,11 +2746,13 @@ html, body {
       row.appendChild(details);
       row.appendChild(controls);
 
-      (function (appObj) {
+      (function (appObj, index) {
         row.onclick = function () {
+          nav.modalIndex = index;
           startEditApp(appObj);
+          highlightAppEditorFocus();
         };
-      })(app);
+      })(app, i);
 
       list.appendChild(row);
     }
@@ -2622,7 +2805,7 @@ html, body {
 
   function startEditApp(app) {
     editingAppId = app.id;
-    $("editorFormTitle").innerHTML = "Edit Application: " + app.name;
+    $("editorFormTitle").innerHTML = "Edit: " + app.name;
     $("appFormName").value = app.name;
     $("appFormUrl").value = app.url || "";
     selectedColorPreset = { c1: app.c1, c2: app.c2 };
@@ -2652,7 +2835,6 @@ html, body {
     }
 
     if (editingAppId) {
-      // Update existing
       for (var i = 0; i < userApps.length; i++) {
         if (userApps[i].id === editingAppId) {
           userApps[i].name = name;
@@ -2664,11 +2846,11 @@ html, body {
       }
       showToast("Updated " + name);
     } else {
-      // Create new
       var newApp = {
         id: "app_" + new Date().getTime(),
         name: name,
         url: url,
+        scheme: "",
         icon: "browser",
         c1: selectedColorPreset.c1,
         c2: selectedColorPreset.c2
@@ -2697,26 +2879,26 @@ html, body {
 
   $("btnCloseAppModal").onclick = closeAppEditorModal;
 
-  /* ---------- Remote Control & Keyboard Handler ---------- */
+  /* ---------- Remote Control & Physical Key Navigation Engine ---------- */
   document.onkeydown = function (e) {
     e = e || window.event;
     var code = e.keyCode || e.which;
     var handled = true;
 
-    // Modal navigation trap
+    // A. MODAL NAVIGATION TRAP
     if (nav.modal) {
       if (code === 8 || code === 27 || code === 10009) { // Back
         if (nav.modal === "launch") { closeLaunchOverlay(); }
         else if (nav.modal === "wallpaper") { closeWallpaperModal(); }
         else if (nav.modal === "appEditor") { closeAppEditorModal(); }
-      } else if (code === 13) { // OK
-        if (nav.modal === "launch") { executeLaunch(); }
+      } else if (code === 13) { // OK / Enter
+        if (nav.modal === "launch") { executeOpenTvInterface(); }
         else if (nav.modal === "wallpaper") {
           var allWp = getAllWallpapers();
           if (allWp[nav.modalIndex]) {
             applyWallpaper(allWp[nav.modalIndex].id);
             renderWallpaperGrid();
-            showToast("Wallpaper applied: " + allWp[nav.modalIndex].name);
+            showToast("Applied: " + allWp[nav.modalIndex].name);
           }
         } else if (nav.modal === "appEditor") {
           if (userApps[nav.modalIndex]) {
@@ -2764,11 +2946,11 @@ html, body {
       return false;
     }
 
-    // Samsung Remote Colour Keys & Desktop Keyboard Equivalents
-    // Red: 403 or 'r' (82)
-    // Green: 404 or 'g' (71)
-    // Yellow: 405 or 'y' (89)
-    // Blue: 406 or 'b' (66)
+    // B. SAMSUNG REMOTE COLOR KEYS
+    // Red: 403 or 'r' (82) -> Open Wallpapers
+    // Green: 404 or 'g' (71) -> Open App Editor
+    // Yellow: 405 or 'y' (89) -> Toggle Effects
+    // Blue: 406 or 'b' (66) -> Next Wallpaper Cycle
     if (code === 403 || code === 82) {
       openWallpaperModal();
     } else if (code === 404 || code === 71) {
@@ -2779,7 +2961,38 @@ html, body {
     } else if (code === 406 || code === 66) {
       cycleNextWallpaper();
     }
-    // Standard Remote Directional Pad
+
+    // C. NUMBER KEYS (1-9) -> DIRECT APP QUICK LAUNCH
+    else if ((code >= 49 && code <= 57) || (code >= 10108 && code <= 10116)) {
+      var slot = (code >= 49 && code <= 57) ? (code - 49) : (code - 10108);
+      if (userApps[slot]) {
+        setFocus(1, slot);
+        launchApplicationTarget(userApps[slot]);
+      }
+    }
+
+    // D. CHANNEL UP / DOWN -> FULL ROW JUMP
+    else if (code === 427 || code === 33) { // Channel Up / Page Up
+      if (nav.row > 0) {
+        setFocus(nav.row - 1, nav.col);
+      }
+    } else if (code === 428 || code === 34) { // Channel Down / Page Down
+      if (nav.row < 3) {
+        setFocus(nav.row + 1, nav.col);
+      }
+    }
+
+    // E. MEDIA PLAY / PAUSE KEYS
+    else if (code === 415 || code === 19 || code === 10252) {
+      showToast("Playback: " + HERO_ITEMS[heroIndex].title);
+    }
+
+    // F. INFO BUTTON
+    else if (code === 457) {
+      showToast("Aurora TV &bull; Samsung LV32F390 &bull; 1080p Stage");
+    }
+
+    // G. ARROW DIRECTIONAL PAD & OK
     else if (code === 37) { // Left
       if (nav.col > 0) {
         setFocus(nav.row, nav.col - 1);
@@ -2822,9 +3035,15 @@ html, body {
   $("btnShortcutBlue").onclick = cycleNextWallpaper;
 
   // Samsung Tizen TV Input Key Registration
+  // Ensures Samsung TV remote does not swallow physical buttons
   try {
     if (window.tizen && window.tizen.tvinputdevice) {
-      var tizenKeys = ["MediaPlayPause", "ColorF0Red", "ColorF1Green", "ColorF2Yellow", "ColorF3Blue"];
+      var tizenKeys = [
+        "MediaPlayPause", "MediaPlay", "MediaPause", "MediaStop",
+        "ColorF0Red", "ColorF1Green", "ColorF2Yellow", "ColorF3Blue",
+        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+        "ChannelUp", "ChannelDown", "Info"
+      ];
       for (var k = 0; k < tizenKeys.length; k++) {
         try {
           window.tizen.tvinputdevice.registerKey(tizenKeys[k]);
@@ -2852,7 +3071,7 @@ html, body {
     setFocus(0, 0);
     setTimeout(function () {
       stage.className = "ready";
-    }, 100);
+    }, 80);
   }
 
   initialize();
