@@ -1,1207 +1,2861 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Aurora TV</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Aurora TV Samsung Edition</title>
+<meta name="description" content="Minimal futuristic TV homepage inspired by Apple Liquid Glass and built for Samsung Smart TVs (2016) and modern browsers.">
+<meta property="og:title" content="Aurora TV Samsung Edition">
+<meta property="og:description" content="Minimal futuristic TV homepage inspired by Apple Liquid Glass and built for Samsung Smart TVs (2016) and modern browsers.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <style>
-/* =====================================================================
-   AURORA TV  -  Minimal futuristic / Liquid Glass home screen
-   Written for 2016-era Samsung (Tizen) browsers: prefixed properties,
-   flexbox only (no grid), no CSS variables, graceful fallbacks.
-   ===================================================================== */
+/* ==========================================================================
+   Base & Resets (Samsung 2016 / ES5 / WebKit Compatible)
+   ========================================================================== */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  overflow: hidden;
+  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, Roboto, sans-serif;
+  color: #ffffff;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
-/* ---------- Base ---------- */
-html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
-body { font-family: "Helvetica Neue", Helvetica, Arial, "Segoe UI", Roboto, sans-serif; color: #fff; }
-
+/* Fixed 1920x1080 virtual stage, scaled to fit any viewport */
 #stage {
-  position: absolute; left: 50%; top: 50%;
-  width: 1920px; height: 1080px; margin-left: -960px; margin-top: -540px;
-  overflow: hidden; background: #05060a;
-  -webkit-transform-origin: 50% 50%; transform-origin: 50% 50%;
-  opacity: 0; -webkit-transition: opacity .9s ease; transition: opacity .9s ease;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  margin-left: -960px;
+  margin-top: -540px;
+  overflow: hidden;
+  background: #06080e;
+  -webkit-transform-origin: 50% 50%;
+  transform-origin: 50% 50%;
+  opacity: 0;
+  -webkit-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
 }
-#stage.ready { opacity: 1; }
-
-/* ---------- Wallpaper layers (cross-fade) ---------- */
-.wall {
-  position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;
-  background-size: cover; background-position: center center; background-repeat: no-repeat;
-  opacity: 0; -webkit-transition: opacity 1.4s ease; transition: opacity 1.4s ease;
-}
-.wall.on { opacity: 1; }
-#scrim {
-  position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;
-  background: rgba(3,4,10,.5);
-  background: -webkit-linear-gradient(top, rgba(3,4,10,.30) 0%, rgba(3,4,10,.72) 100%);
-  background: linear-gradient(to bottom, rgba(3,4,10,.30) 0%, rgba(3,4,10,.72) 100%);
+#stage.ready {
+  opacity: 1;
 }
 
-/* ---------- Ambient accent glow (follows focused tile) ---------- */
-.glow {
-  position: absolute; right: -380px; top: -420px; width: 1500px; height: 1300px; opacity: 0;
-  -webkit-transition: opacity 1.2s ease; transition: opacity 1.2s ease;
-}
-.glow.on { opacity: 1; }
-
-/* ---------- Animated effects: aurora blobs + particles ---------- */
-#fx { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; }
-body.fx-off #fx { display: none; }
-.blob { position: absolute; border-radius: 50%; opacity: .55; }
-.b1 { left: -320px; top: -360px; width: 1100px; height: 1100px;
-  background: -webkit-radial-gradient(center, rgba(90,110,255,.50) 0%, rgba(90,110,255,0) 66%);
-  background: radial-gradient(circle at center, rgba(90,110,255,.50) 0%, rgba(90,110,255,0) 66%);
-  -webkit-animation: drift1 52s ease-in-out infinite alternate; animation: drift1 52s ease-in-out infinite alternate; }
-.b2 { right: -340px; bottom: -420px; width: 1200px; height: 1200px;
-  background: -webkit-radial-gradient(center, rgba(160,90,255,.44) 0%, rgba(160,90,255,0) 66%);
-  background: radial-gradient(circle at center, rgba(160,90,255,.44) 0%, rgba(160,90,255,0) 66%);
-  -webkit-animation: drift2 64s ease-in-out infinite alternate; animation: drift2 64s ease-in-out infinite alternate; }
-.b3 { left: 640px; top: 280px; width: 800px; height: 800px; opacity: .4;
-  background: -webkit-radial-gradient(center, rgba(120,210,255,.30) 0%, rgba(120,210,255,0) 66%);
-  background: radial-gradient(circle at center, rgba(120,210,255,.30) 0%, rgba(120,210,255,0) 66%);
-  -webkit-animation: drift3 78s ease-in-out infinite alternate; animation: drift3 78s ease-in-out infinite alternate; }
-#pts { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
-.pt {
-  position: absolute; bottom: -30px; border-radius: 50%; opacity: 0;
-  background: -webkit-radial-gradient(center, rgba(255,255,255,.95) 0%, rgba(160,175,255,.5) 40%, rgba(160,175,255,0) 72%);
-  background: radial-gradient(circle at center, rgba(255,255,255,.95) 0%, rgba(160,175,255,.5) 40%, rgba(160,175,255,0) 72%);
-  -webkit-animation: floatUp 30s linear infinite; animation: floatUp 30s linear infinite;
+/* ==========================================================================
+   Wallpapers & Background Layers
+   ========================================================================== */
+#bgLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 1;
+  background-color: #06080e;
+  background-position: center center;
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  background-size: cover;
+  -webkit-transition: background 0.7s ease, opacity 0.7s ease;
+  transition: background 0.7s ease, opacity 0.7s ease;
 }
 
-@-webkit-keyframes drift1 { from { -webkit-transform: translate(0,0) scale(1); } to { -webkit-transform: translate(280px,200px) scale(1.15); } }
-@keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(280px,200px) scale(1.15); } }
-@-webkit-keyframes drift2 { from { -webkit-transform: translate(0,0) scale(1.1); } to { -webkit-transform: translate(-300px,-160px) scale(.95); } }
-@keyframes drift2 { from { transform: translate(0,0) scale(1.1); } to { transform: translate(-300px,-160px) scale(.95); } }
-@-webkit-keyframes drift3 { from { -webkit-transform: translate(-160px,60px) scale(.9); } to { -webkit-transform: translate(220px,-120px) scale(1.2); } }
-@keyframes drift3 { from { transform: translate(-160px,60px) scale(.9); } to { transform: translate(220px,-120px) scale(1.2); } }
-@-webkit-keyframes floatUp {
-  0% { opacity: 0; -webkit-transform: translate(0,0); }
-  10% { opacity: .85; }
-  90% { opacity: .55; }
-  100% { opacity: 0; -webkit-transform: translate(70px,-1160px); }
+#bgOverlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 2;
+  background: -webkit-linear-gradient(top, rgba(5,7,14,0.3) 0%, rgba(5,7,14,0.7) 60%, rgba(5,7,14,0.96) 100%);
+  background: linear-gradient(180deg, rgba(5,7,14,0.3) 0%, rgba(5,7,14,0.7) 60%, rgba(5,7,14,0.96) 100%);
+  pointer-events: none;
 }
-@keyframes floatUp {
-  0% { opacity: 0; transform: translate(0,0); }
-  10% { opacity: .85; }
-  90% { opacity: .55; }
-  100% { opacity: 0; transform: translate(70px,-1160px); }
-}
-@-webkit-keyframes rise { from { opacity: 0; -webkit-transform: translateY(36px); } to { opacity: 1; -webkit-transform: translateY(0); } }
-@keyframes rise { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: translateY(0); } }
-@-webkit-keyframes spin { to { -webkit-transform: rotate(360deg); } }
-@keyframes spin { to { transform: rotate(360deg); } }
 
-/* ---------- Liquid glass ----------
-   Fallback first (solid-ish translucent), then real frosted glass where
-   backdrop-filter is supported.                                          */
-.glass {
+/* Ambient glow system */
+.glowLayer {
+  position: absolute;
+  width: 1600px;
+  height: 1200px;
+  right: -300px;
+  top: -350px;
+  opacity: 0;
+  z-index: 2;
+  pointer-events: none;
+  -webkit-transition: opacity 0.9s ease;
+  transition: opacity 0.9s ease;
+}
+.glowLayer.on {
+  opacity: 0.85;
+}
+
+#glowCool {
+  position: absolute;
+  left: -400px;
+  bottom: -400px;
+  width: 1300px;
+  height: 1100px;
+  z-index: 2;
+  pointer-events: none;
+  background: -webkit-radial-gradient(center, rgba(30, 80, 200, 0.22) 0%, rgba(0,0,0,0) 70%);
+  background: radial-gradient(ellipse at center, rgba(30, 80, 200, 0.22) 0%, rgba(0,0,0,0) 70%);
+}
+
+/* Lightweight floating particles (Pure CSS, low CPU) */
+#particlesContainer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+  display: block;
+}
+#particlesContainer.disabled {
+  display: none !important;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 12px rgba(130, 180, 255, 0.7);
+  -webkit-animation: driftParticle 14s infinite linear;
+  animation: driftParticle 14s infinite linear;
+}
+
+@-webkit-keyframes driftParticle {
+  0% { -webkit-transform: translateY(0px) translateX(0px); opacity: 0; }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.6; }
+  100% { -webkit-transform: translateY(-400px) translateX(120px); opacity: 0; }
+}
+@keyframes driftParticle {
+  0% { transform: translateY(0px) translateX(0px); opacity: 0; }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.6; }
+  100% { transform: translateY(-400px) translateX(120px); opacity: 0; }
+}
+
+/* ==========================================================================
+   Top Header Bar
+   ========================================================================== */
+#topBar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 110px;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+#logoArea {
+  position: absolute;
+  left: 80px;
+  top: 30px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+#logoOrb {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  margin-right: 16px;
+  background: -webkit-linear-gradient(top left, #8ef0f7, #6b52ff 55%, #ff529a);
+  background: linear-gradient(135deg, #8ef0f7, #6b52ff 55%, #ff529a);
+  box-shadow: 0 4px 20px rgba(107, 82, 255, 0.6);
+}
+
+#logoTitle {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+}
+
+#logoTag {
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-left: 14px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#greetingBadge {
+  position: absolute;
+  left: 480px;
+  top: 38px;
+  font-size: 26px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.2px;
+}
+
+#clockModule {
+  position: absolute;
+  right: 80px;
+  top: 22px;
+  text-align: right;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+#wifiStatus {
+  width: 32px;
+  height: 32px;
+  margin-right: 28px;
+  opacity: 0.75;
+}
+
+#clockTime {
+  font-size: 52px;
+  font-weight: 300;
+  line-height: 52px;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  margin-right: 20px;
+}
+
+#clockDate {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 24px;
+  color: rgba(255, 255, 255, 0.6);
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+  padding-left: 18px;
+  text-align: left;
+}
+
+/* ==========================================================================
+   Main Rows Container & Tracks
+   ========================================================================== */
+#rowsViewport {
+  position: absolute;
+  left: 0;
+  top: 110px;
+  width: 1920px;
+  height: 890px;
+  overflow: hidden;
+  z-index: 5;
+}
+
+#rowsTrack {
   position: relative;
-  background: rgba(30,34,52,.78);
-  border: 1px solid rgba(255,255,255,.16);
+  width: 1920px;
+  -webkit-transition: -webkit-transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.tvRow {
+  position: relative;
+  margin-bottom: 34px;
+  opacity: 0.6;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+.tvRow.active, .tvRow.heroRow {
+  opacity: 1;
+}
+
+.rowHeading {
+  margin: 0 0 0 80px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #ffffff;
+  height: 42px;
+  line-height: 42px;
+}
+
+.itemsTrack {
+  position: relative;
+  display: -webkit-flex;
+  display: flex;
+  padding: 16px 0 20px 80px;
+  -webkit-transition: -webkit-transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ==========================================================================
+   Card Items & Focus Ring (Liquid Glass Styling)
+   ========================================================================== */
+.cardItem {
+  position: relative;
+  margin-right: 28px;
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+  border-radius: 22px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  -webkit-transition: -webkit-transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+  overflow: visible;
+}
+
+.cardItem:hover {
+  -webkit-transform: scale(1.03);
+  transform: scale(1.03);
+}
+
+.cardItem.focused {
+  -webkit-transform: scale(1.09);
+  transform: scale(1.09);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 35px rgba(130, 160, 255, 0.35);
+  z-index: 10;
+}
+
+/* High-contrast TV Focus Ring */
+.focusRing {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  right: -6px;
+  bottom: -6px;
+  border: 5px solid #ffffff;
+  border-radius: 28px;
+  opacity: 0;
+  pointer-events: none;
+  -webkit-transition: opacity 0.18s ease;
+  transition: opacity 0.18s ease;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.7);
+}
+
+.cardItem.focused .focusRing {
+  opacity: 1;
+}
+
+/* Glass shine surface */
+.cardFace {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 22px;
+  overflow: hidden;
+}
+.cardFace:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 50%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 50%);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Hero Row
+   ========================================================================== */
+.heroRow {
+  height: 450px;
+}
+
+#heroBanner {
+  position: absolute;
+  left: 80px;
+  top: 10px;
+  width: 1760px;
+  height: 410px;
+  border-radius: 32px;
+  background: rgba(18, 22, 38, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+#heroBannerShine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: -webkit-linear-gradient(top left, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%);
+  pointer-events: none;
+}
+
+#heroTextPane {
+  position: absolute;
+  left: 60px;
+  top: 40px;
+  width: 860px;
+  z-index: 3;
+  -webkit-transition: opacity 0.3s ease, -webkit-transform 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+#heroTextPane.fade {
+  opacity: 0;
+  -webkit-transform: translateX(-18px);
+  transform: translateX(-18px);
+}
+
+#heroBadge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+#heroTitle {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 72px;
+  letter-spacing: -1px;
+  margin: 0 0 10px 0;
+  color: #ffffff;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+}
+
+#heroMeta {
+  font-size: 22px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 14px;
+}
+
+#heroDesc {
+  font-size: 24px;
+  line-height: 36px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  width: 820px;
+  height: 72px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+#heroButtons {
+  display: -webkit-flex;
+  display: flex;
+}
+
+.heroBtn {
+  position: relative;
+  height: 64px;
+  line-height: 64px;
+  padding: 0 40px;
+  margin-right: 22px;
+  border-radius: 32px;
+  font-size: 26px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-transition: -webkit-transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#btnPlayHero {
+  background: #ffffff;
+  color: #0b0e18;
+}
+#btnListHero {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.heroBtn.focused {
+  -webkit-transform: scale(1.08);
+  transform: scale(1.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 255, 255, 0.4);
+}
+.heroBtn .focusRing {
+  border-radius: 38px;
+}
+
+#heroArtPane {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 840px;
+  height: 410px;
+  overflow: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+#heroArtPane.fade {
+  opacity: 0;
+}
+
+#heroArtGrad {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: -webkit-linear-gradient(left, rgba(18,22,38,1) 0%, rgba(18,22,38,0) 40%);
+  background: linear-gradient(90deg, rgba(18,22,38,1) 0%, rgba(18,22,38,0) 40%);
+  z-index: 2;
+}
+
+#heroArtVisual {
+  position: absolute;
+  right: 40px;
+  top: 35px;
+  width: 680px;
+  height: 340px;
+  border-radius: 26px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.orbArt {
+  position: absolute;
+  border-radius: 50%;
+}
+
+#heroDots {
+  position: absolute;
+  right: 80px;
+  bottom: 24px;
+  z-index: 4;
+}
+.heroDot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.3);
+  margin-left: 10px;
+  -webkit-transition: width 0.3s ease, background 0.3s ease;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.heroDot.active {
+  width: 36px;
+  background: #ffffff;
+}
+
+/* ==========================================================================
+   Apps Row
+   ========================================================================== */
+.appCard {
+  width: 250px;
+  height: 154px;
+}
+
+.appIconWrap {
+  position: absolute;
+  left: 24px;
+  top: 20px;
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.appIconSvg {
+  width: 32px;
+  height: 32px;
+}
+
+.appName {
+  position: absolute;
+  left: 24px;
+  bottom: 20px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.appUrlBadge {
+  position: absolute;
+  right: 18px;
+  top: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+/* Add App special card */
+.addAppCard {
+  border: 2px dashed rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.04);
+}
+.addAppCard .appName {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ==========================================================================
+   Continue Watching Row
+   ========================================================================== */
+.watchCard {
+  width: 380px;
+  height: 216px;
+}
+
+.watchThumb {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.watchShade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 140px;
+  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.85) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+.watchPlayIcon {
+  position: absolute;
+  right: 20px;
+  top: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+.watchTitle {
+  position: absolute;
+  left: 22px;
+  bottom: 46px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.watchSub {
+  position: absolute;
+  left: 22px;
+  bottom: 18px;
+  font-size: 19px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.watchProgressBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.25);
+}
+.watchProgressFill {
+  height: 6px;
+  background: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+/* ==========================================================================
+   Inputs & Settings Row
+   ========================================================================== */
+.sysCard {
+  width: 270px;
+  height: 110px;
+}
+
+.sysIconWrap {
+  position: absolute;
+  left: 20px;
+  top: 24px;
+  width: 62px;
+  height: 62px;
+  border-radius: 20px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.sysLabelWrap {
+  position: absolute;
+  left: 98px;
+  top: 25px;
+  right: 16px;
+}
+
+.sysTitle {
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sysSub {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   Bottom Hints Bar & Remote Colour Shortcuts
+   ========================================================================== */
+#bottomHintBar {
+  position: absolute;
+  left: 0;
+  bottom: 16px;
+  width: 1920px;
+  height: 48px;
+  line-height: 48px;
+  text-align: center;
+  z-index: 10;
+  font-size: 21px;
+  color: rgba(255, 255, 255, 0.65);
+  pointer-events: auto;
+}
+
+.remoteKeyHint {
+  display: inline-block;
+  margin: 0 16px;
+}
+
+.remotePill {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  margin-right: 8px;
+  color: #ffffff;
+  vertical-align: middle;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.remotePill:hover {
+  -webkit-transform: scale(1.08);
+  transform: scale(1.08);
+}
+
+.pillRed { background: #e50914; }
+.pillGreen { background: #1db954; }
+.pillYellow { background: #f5a623; color: #000000; }
+.pillBlue { background: #0084ff; }
+.pillKey { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); }
+
+/* ==========================================================================
+   Modals & Overlays (Liquid Glass Panels)
+   ========================================================================== */
+.modalOverlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 100;
+  background: rgba(3, 5, 10, 0.88);
+  display: none;
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+.modalOverlay.active {
+  display: block;
+  opacity: 1;
+}
+
+.glassDialog {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  background: rgba(18, 24, 40, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 36px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.30), inset 0 -1px 0 rgba(255,255,255,.04), 0 30px 70px rgba(0,0,0,.45);
-}
-.glass:before {
-  content: ""; position: absolute; left: 0; top: 0; right: 0; height: 50%; border-radius: inherit; pointer-events: none;
-  background: -webkit-linear-gradient(top, rgba(255,255,255,.14), rgba(255,255,255,0));
-  background: linear-gradient(to bottom, rgba(255,255,255,.14), rgba(255,255,255,0));
-}
-@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .glass {
-    background: rgba(255,255,255,.08);
-    -webkit-backdrop-filter: blur(30px) saturate(160%); backdrop-filter: blur(30px) saturate(160%);
-  }
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(100, 140, 255, 0.25);
+  box-sizing: border-box;
+  padding: 44px 50px;
+  overflow: hidden;
 }
 
-/* ---------- Rows / scrolling ---------- */
-#rows { position: absolute; left: 0; top: 0; width: 1920px; height: 1000px; overflow: hidden; z-index: 2; }
-#rowsInner {
-  position: relative; width: 1920px;
-  -webkit-transition: -webkit-transform .6s cubic-bezier(.2,.7,.2,1); transition: transform .6s cubic-bezier(.2,.7,.2,1);
-}
-.row { position: relative; padding-bottom: 30px; opacity: .6; -webkit-transition: opacity .35s ease; transition: opacity .35s ease; }
-.row.active, .row.hero { opacity: 1; }
-.rowTitle { margin: 0 0 0 110px; height: 46px; line-height: 46px; font-size: 34px; font-weight: 500; letter-spacing: 1px; color: rgba(255,255,255,.92); }
-.track {
-  position: relative; display: -webkit-flex; display: flex; padding: 20px 0 20px 110px;
-  -webkit-transition: -webkit-transform .42s cubic-bezier(.2,.7,.2,1); transition: transform .42s cubic-bezier(.2,.7,.2,1);
+.dialogHeader {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  -webkit-align-items: center;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  padding-bottom: 22px;
+  margin-bottom: 28px;
 }
 
-/* ---------- Home hero: clock + spotlight ---------- */
-.hero { height: 470px; }
-#hello { position: absolute; left: 114px; top: 76px; font-size: 28px; letter-spacing: 8px; text-transform: uppercase; color: rgba(255,255,255,.62); }
-#clock { position: absolute; left: 100px; top: 108px; white-space: nowrap; font-size: 210px; font-weight: 200; line-height: 222px; letter-spacing: -4px; text-shadow: 0 0 70px rgba(130,150,255,.40); }
-#clkS { font-size: 68px; letter-spacing: 0; color: rgba(255,255,255,.55); margin-left: 8px; }
-#date { position: absolute; left: 114px; top: 338px; font-size: 42px; font-weight: 300; letter-spacing: 1px; color: rgba(255,255,255,.80); }
-
-#spot { position: absolute; left: 1010px; top: 70px; width: 800px; height: 350px; border-radius: 42px; overflow: hidden; }
-#spotTint { position: absolute; left: 0; top: 0; right: 0; bottom: 0; -webkit-transition: opacity .35s ease; transition: opacity .35s ease; }
-#spotText { position: absolute; left: 48px; top: 36px; width: 704px; z-index: 2; -webkit-transition: opacity .35s ease, -webkit-transform .35s ease; transition: opacity .35s ease, transform .35s ease; }
-#spotText.out, #spotTint.out { opacity: 0; }
-#spotText.out { -webkit-transform: translateX(-22px); transform: translateX(-22px); }
-#spotTag { display: inline-block; padding: 5px 18px; border-radius: 20px; font-size: 22px; font-weight: 600; letter-spacing: 3px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.22); }
-#spotTitle { font-size: 60px; font-weight: 600; letter-spacing: -1px; line-height: 76px; margin-top: 8px; }
-#spotMeta { font-size: 24px; color: rgba(255,255,255,.66); margin: 2px 0 10px 0; }
-#spotDesc { font-size: 26px; line-height: 36px; color: rgba(255,255,255,.84); height: 72px; overflow: hidden; }
-#spotBtns { position: absolute; left: 48px; bottom: 36px; display: -webkit-flex; display: flex; z-index: 2; }
-#dots { position: absolute; right: 40px; top: 46px; z-index: 2; font-size: 0; }
-#dots i { display: inline-block; width: 12px; height: 12px; border-radius: 6px; margin-left: 10px; background: rgba(255,255,255,.3); -webkit-transition: width .3s, background .3s; transition: width .3s, background .3s; }
-#dots i.on { width: 36px; background: #fff; }
-
-.btn {
-  position: relative; -webkit-box-sizing: border-box; box-sizing: border-box; height: 68px; line-height: 66px; padding: 0 40px; margin-right: 22px;
-  border-radius: 34px; font-size: 28px; font-weight: 600; white-space: nowrap;
-  -webkit-transition: -webkit-transform .28s ease; transition: transform .28s ease;
+.dialogTitle {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
 }
-#btnPlay { background: #fff; color: #0a0d16; border: 1px solid #fff; }
-#btnList { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.30); color: #fff; }
-.btn.focused { -webkit-transform: scale(1.08); transform: scale(1.08); }
 
-/* ---------- Focus ring (opacity only = cheap) ---------- */
-.ring {
-  position: absolute; left: -7px; top: -7px; right: -7px; bottom: -7px;
-  border: 3px solid #fff; border-radius: 41px; opacity: 0; pointer-events: none;
-  box-shadow: 0 0 34px rgba(120,150,255,.75), 0 0 80px rgba(160,100,255,.40);
-  -webkit-transition: opacity .22s ease; transition: opacity .22s ease;
+.dialogSubtitle {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 4px;
 }
-.focused > .ring { opacity: 1; }
 
-/* ---------- Tiles (faux glass, no backdrop-filter = fast) ---------- */
-.tile {
-  position: relative; margin-right: 30px; -webkit-flex-shrink: 0; flex-shrink: 0; border-radius: 34px;
-  -webkit-transition: -webkit-transform .3s cubic-bezier(.2,.8,.2,1); transition: transform .3s cubic-bezier(.2,.8,.2,1);
-  -webkit-animation: rise .7s ease backwards; animation: rise .7s ease backwards;
+.dialogCloseBtn {
+  padding: 12px 26px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
 }
-.tile.focused { -webkit-transform: scale(1.08); transform: scale(1.08); }
-.face {
-  position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 34px; overflow: hidden;
-  background: rgba(40,45,66,.72); border: 1px solid rgba(255,255,255,.17);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.32), 0 18px 40px rgba(0,0,0,.40);
+.dialogCloseBtn:hover, .dialogCloseBtn.focused {
+  background: #ffffff;
+  color: #0b0e18;
 }
-.face:after {
-  content: ""; position: absolute; left: 0; top: 0; right: 0; bottom: 0; pointer-events: none;
-  background: -webkit-linear-gradient(top, rgba(255,255,255,.18), rgba(255,255,255,0) 48%);
-  background: linear-gradient(to bottom, rgba(255,255,255,.18), rgba(255,255,255,0) 48%);
-}
-.acc { position: absolute; left: -70px; top: -90px; width: 300px; height: 300px; border-radius: 150px; }
 
-.badge {
-  position: absolute; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center;
-  -webkit-box-sizing: border-box; box-sizing: border-box; border: 1px solid rgba(255,255,255,.32);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 22px rgba(0,0,0,.30); z-index: 2; color: #fff;
+/* Wallpaper Modal Specifics */
+#wallpaperModal .glassDialog {
+  width: 1460px;
+  height: 820px;
 }
-.badge svg { width: 46px; height: 46px; display: block; }
-.badge .ltr { font-size: 42px; font-weight: 600; line-height: 1; }
 
-.app { width: 300px; height: 200px; }
-.app .badge { left: 28px; top: 26px; width: 76px; height: 76px; border-radius: 24px; }
-.app .name { position: absolute; left: 30px; right: 20px; bottom: 50px; font-size: 34px; font-weight: 500; letter-spacing: .3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; }
-.app .host { position: absolute; left: 30px; right: 20px; bottom: 22px; font-size: 22px; color: rgba(255,255,255,.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; }
-
-.watch { width: 420px; height: 236px; }
-.watch .orb { position: absolute; width: 300px; height: 300px; border-radius: 150px; right: -90px; top: -120px; background: rgba(255,255,255,.12); }
-.watch .shade { position: absolute; left: 0; right: 0; bottom: 0; height: 160px;
-  background: -webkit-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,.6)); background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,.6)); }
-.watch .play { position: absolute; right: 24px; top: 22px; width: 62px; height: 62px; border-radius: 31px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); z-index: 2; }
-.watch .play:before { content: ""; position: absolute; left: 24px; top: 17px; border-left: 20px solid #fff; border-top: 12px solid transparent; border-bottom: 12px solid transparent; }
-.watch .title { position: absolute; left: 28px; right: 24px; bottom: 72px; font-size: 34px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; text-shadow: 0 2px 10px rgba(0,0,0,.5); }
-.watch .sub { position: absolute; left: 28px; bottom: 42px; font-size: 22px; color: rgba(255,255,255,.82); z-index: 2; }
-.watch .bar { position: absolute; left: 28px; right: 28px; bottom: 24px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.26); z-index: 2; }
-.watch .bar i { display: block; height: 6px; border-radius: 3px; background: #fff; box-shadow: 0 0 12px rgba(255,255,255,.8); }
-
-.sys { width: 300px; height: 110px; border-radius: 55px; }
-.sys .face { border-radius: 55px; background: rgba(255,255,255,.09); }
-.sys.focused .face { background: rgba(255,255,255,.2); }
-.sys .ring { border-radius: 62px; }
-.sys .badge { left: 22px; top: 22px; width: 66px; height: 66px; border-radius: 33px; }
-.sys .badge svg { width: 34px; height: 34px; }
-.sys .name { position: absolute; left: 108px; right: 16px; top: 0; height: 110px; line-height: 110px; font-size: 28px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; }
-
-/* ---------- Mini clock, hint bar, toast ---------- */
-#mini {
-  position: absolute; right: 80px; top: 34px; z-index: 5; padding: 8px 34px; border-radius: 40px; font-size: 38px; font-weight: 300; letter-spacing: 2px;
-  opacity: 0; -webkit-transform: translateY(-14px); transform: translateY(-14px);
-  -webkit-transition: opacity .35s ease, -webkit-transform .35s ease; transition: opacity .35s ease, transform .35s ease;
+#wallpaperGrid {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  max-height: 480px;
+  overflow-y: auto;
+  margin-bottom: 24px;
+  padding: 8px 4px;
 }
-#mini.on { opacity: 1; -webkit-transform: translateY(0); transform: translateY(0); }
-#hint { position: absolute; left: 0; bottom: 26px; width: 1920px; text-align: center; font-size: 22px; letter-spacing: 1px; color: rgba(255,255,255,.5); z-index: 6; }
-#hint b { color: #fff; font-weight: 600; padding: 0 6px; }
-#hint span { margin: 0 24px; }
-#toast {
-  position: absolute; left: 50%; bottom: 100px; width: 700px; margin-left: -350px; padding: 20px 0; text-align: center; z-index: 50;
-  border-radius: 40px; background: rgba(28,32,48,.95); border: 1px solid rgba(255,255,255,.2); font-size: 28px; font-weight: 500;
-  box-shadow: 0 16px 40px rgba(0,0,0,.5);
-  opacity: 0; -webkit-transform: translateY(20px); transform: translateY(20px);
-  -webkit-transition: opacity .3s ease, -webkit-transform .3s ease; transition: opacity .3s ease, transform .3s ease;
-}
-#toast.show { opacity: 1; -webkit-transform: translateY(0); transform: translateY(0); }
 
-/* ---------- Launch overlay ---------- */
-#launch {
-  position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; z-index: 40; background: rgba(4,5,10,.9); opacity: 0; visibility: hidden;
-  -webkit-transition: opacity .3s ease, visibility .3s; transition: opacity .3s ease, visibility .3s;
-  display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center;
+.wpThumbCard {
+  position: relative;
+  width: 320px;
+  height: 180px;
+  margin: 12px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: #121828;
+  -webkit-background-size: cover;
+  background-size: cover;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  -webkit-transition: -webkit-transform 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
-#launch.show { opacity: 1; visibility: visible; }
-#launch .box {
-  width: 660px; padding: 56px 0 52px 0; text-align: center; border-radius: 60px;
-  -webkit-transform: scale(.9); transform: scale(.9); -webkit-transition: -webkit-transform .4s cubic-bezier(.2,.8,.2,1); transition: transform .4s cubic-bezier(.2,.8,.2,1);
-}
-#launch.show .box { -webkit-transform: scale(1); transform: scale(1); }
-#lBadge { position: relative; width: 168px; height: 168px; margin: 0 auto 34px auto; border-radius: 52px; }
-#lBadge svg { width: 88px; height: 88px; }
-#lBadge .ltr { font-size: 84px; }
-#lName { font-size: 58px; font-weight: 600; letter-spacing: -.5px; padding: 0 30px; }
-#lSub { font-size: 28px; color: rgba(255,255,255,.65); margin-top: 10px; padding: 0 30px; }
-.spinner { width: 50px; height: 50px; margin: 40px auto 0 auto; border: 5px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%;
-  -webkit-animation: spin .9s linear infinite; animation: spin .9s linear infinite; }
 
-/* ---------- Settings panels (wallpaper + app editor) ---------- */
-#panelLayer {
-  position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; z-index: 30; background: rgba(2,3,8,.42); opacity: 0; visibility: hidden;
-  -webkit-transition: opacity .3s ease, visibility .3s; transition: opacity .3s ease, visibility .3s;
+.wpThumbCard.selected {
+  border-color: #6b52ff;
+  box-shadow: 0 0 25px rgba(107, 82, 255, 0.7);
 }
-#panelLayer.show { opacity: 1; visibility: visible; }
-#panel { position: absolute; overflow: hidden; -webkit-box-sizing: border-box; box-sizing: border-box; }
-#panel.p-wall { left: 80px; right: 80px; bottom: 40px; height: 660px; }
-#panel.p-apps { left: 200px; top: 70px; width: 1520px; height: 940px; }
-.pTitle { position: absolute; left: 56px; top: 34px; font-size: 44px; font-weight: 600; letter-spacing: -.5px; z-index: 2; }
-.pSub { position: absolute; left: 56px; top: 92px; font-size: 24px; color: rgba(255,255,255,.62); z-index: 2; }
-.pNote { position: absolute; left: 56px; right: 56px; font-size: 22px; line-height: 30px; color: rgba(255,255,255,.5); z-index: 2; }
 
-.pf {
-  position: relative; -webkit-box-sizing: border-box; box-sizing: border-box; background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.22);
-  border-radius: 26px; color: #fff; font-size: 28px; font-weight: 500; text-align: center;
-  -webkit-transition: background .2s ease, box-shadow .2s ease; transition: background .2s ease, box-shadow .2s ease;
+.wpThumbCard.selected:after {
+  content: "ACTIVE";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #6b52ff;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  padding: 4px 10px;
+  border-radius: 10px;
 }
-.pf.focused { background: rgba(255,255,255,.26); box-shadow: 0 0 0 4px #fff, 0 0 36px rgba(130,150,255,.75); }
-.btnp { display: inline-block; height: 76px; line-height: 74px; padding: 0 38px; margin-right: 18px; border-radius: 38px; }
-.field { display: inline-block; height: 76px; text-align: left; border-radius: 26px; }
-.field.editing { background: rgba(255,255,255,.34); }
-.field input {
-  display: block; width: 100%; height: 100%; margin: 0; padding: 0 24px; border: 0; outline: 0; background: transparent; color: #fff;
-  font-family: inherit; font-size: 27px; -webkit-box-sizing: border-box; box-sizing: border-box;
-}
-.field input::-webkit-input-placeholder { color: rgba(255,255,255,.38); }
-.field input::placeholder { color: rgba(255,255,255,.38); }
-.pRow { position: absolute; left: 56px; display: -webkit-flex; display: flex; z-index: 2; }
 
-.strip { position: absolute; left: 0; right: 0; top: 134px; height: 236px; overflow: hidden; z-index: 2; }
-.stripIn { position: relative; display: -webkit-flex; display: flex; padding: 30px 0 30px 56px; -webkit-transition: -webkit-transform .35s ease; transition: -webkit-transform .35s ease; transition: transform .35s ease; }
-.thumb {
-  position: relative; width: 300px; height: 170px; margin-right: 24px; -webkit-flex-shrink: 0; flex-shrink: 0; border-radius: 26px; overflow: hidden;
-  background-size: cover; background-position: center center; border: 1px solid rgba(255,255,255,.22);
-  -webkit-transition: -webkit-transform .25s ease, box-shadow .25s ease; transition: transform .25s ease, box-shadow .25s ease;
+.wpThumbCard.focused {
+  -webkit-transform: scale(1.08);
+  transform: scale(1.08);
+  border-color: #ffffff;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 255, 255, 0.8);
+  z-index: 5;
 }
-.thumb.focused { -webkit-transform: scale(1.06); transform: scale(1.06); box-shadow: 0 0 0 4px #fff, 0 0 40px rgba(130,150,255,.75); }
-.thumb .tl { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 16px 10px 16px; font-size: 22px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  background: -webkit-linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,.7)); background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,.7)); }
-.thumb .tick { display: none; position: absolute; right: 12px; top: 12px; width: 38px; height: 38px; border-radius: 19px; background: rgba(255,255,255,.95); }
-.thumb .tick svg { width: 24px; height: 24px; margin: 7px; display: block; }
 
-.pBody { position: absolute; left: 0; right: 0; top: 136px; height: 640px; overflow: hidden; z-index: 2; }
-.pScroll { position: relative; padding: 8px 56px 8px 56px; -webkit-transition: -webkit-transform .3s ease; transition: -webkit-transform .3s ease; transition: transform .3s ease; }
-.arow { display: -webkit-flex; display: flex; height: 76px; margin-bottom: 20px; }
-.arow .pf { margin-right: 16px; }
-.ibtn { width: 76px; height: 76px; padding: 0; }
-.ibtn svg { width: 34px; height: 34px; margin: 20px; display: block; }
-.pFoot { position: absolute; left: 56px; top: 804px; display: -webkit-flex; display: flex; z-index: 2; }
+.wpNameBadge {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  right: 14px;
+  font-size: 21px;
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.55);
+  padding: 6px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wpDeleteBtn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  background: rgba(229, 9, 20, 0.85);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 32px;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Custom wallpaper input row */
+.customWpRow {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.modalInput {
+  height: 58px;
+  padding: 0 24px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 22px;
+  box-sizing: border-box;
+  outline: none;
+}
+.modalInput:focus, .modalInput.focused {
+  border-color: #8ef0f7;
+  box-shadow: 0 0 16px rgba(142, 240, 247, 0.5);
+}
+
+.actionBtn {
+  height: 58px;
+  line-height: 58px;
+  padding: 0 32px;
+  border-radius: 18px;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  border: none;
+  color: #ffffff;
+  box-sizing: border-box;
+  -webkit-transition: -webkit-transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.actionBtn:hover, .actionBtn.focused {
+  -webkit-transform: scale(1.05);
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.actionBtnPrimary {
+  background: -webkit-linear-gradient(left, #6b52ff, #9952ff);
+  background: linear-gradient(90deg, #6b52ff, #9952ff);
+}
+.actionBtnSecondary {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.actionBtnDanger {
+  background: #e50914;
+}
+
+/* ==========================================================================
+   App Editor Modal Specifics
+   ========================================================================== */
+#appEditorModal .glassDialog {
+  width: 1560px;
+  height: 840px;
+}
+
+.editorColumns {
+  display: -webkit-flex;
+  display: flex;
+  height: 600px;
+}
+
+.appListCol {
+  width: 820px;
+  height: 600px;
+  overflow-y: auto;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  padding-right: 28px;
+  box-sizing: border-box;
+}
+
+.appEditItem {
+  position: relative;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  -webkit-transition: background 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.appEditItem.selected {
+  background: rgba(107, 82, 255, 0.25);
+  border-color: #6b52ff;
+}
+
+.appEditItem.focused {
+  border-color: #ffffff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  -webkit-transform: scale(1.02);
+  transform: scale(1.02);
+}
+
+.appEditIndex {
+  width: 36px;
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.appEditIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  margin-right: 18px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+.appEditDetails {
+  -webkit-flex-grow: 1;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.appEditName {
+  font-size: 24px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appEditUrl {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appEditControls {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+.miniBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  margin-left: 8px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+}
+.miniBtn:hover, .miniBtn.focused {
+  background: #ffffff;
+  color: #000000;
+}
+.miniBtnDanger:hover, .miniBtnDanger.focused {
+  background: #e50914;
+  color: #ffffff;
+}
+
+.appFormCol {
+  width: 660px;
+  padding-left: 36px;
+  box-sizing: border-box;
+}
+
+.formSectionTitle {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.formField {
+  margin-bottom: 18px;
+}
+.formLabel {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+}
+
+.colorPickerRow {
+  display: -webkit-flex;
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.colorOption {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  margin-right: 12px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+.colorOption.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  -webkit-transform: scale(1.15);
+  transform: scale(1.15);
+}
+
+.editorBottomBar {
+  margin-top: 18px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  -webkit-align-items: center;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ==========================================================================
+   App Launch Screen Overlay
+   ========================================================================== */
+#launchOverlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 120;
+  background: rgba(5, 7, 14, 0.96);
+  display: none;
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+#launchOverlay.active {
+  display: -webkit-flex;
+  display: flex;
+  opacity: 1;
+}
+
+.launchBox {
+  text-align: center;
+  max-width: 900px;
+}
+
+.launchBigIcon {
+  width: 180px;
+  height: 180px;
+  border-radius: 44px;
+  margin: 0 auto 36px auto;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+}
+
+.launchAppName {
+  font-size: 58px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.launchAppSub {
+  font-size: 26px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 28px;
+}
+
+.launchSpinner {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 30px auto;
+  border: 5px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  -webkit-animation: spinAnimation 0.85s linear infinite;
+  animation: spinAnimation 0.85s linear infinite;
+}
+
+@-webkit-keyframes spinAnimation { to { -webkit-transform: rotate(360deg); } }
+@keyframes spinAnimation { to { transform: rotate(360deg); } }
+
+.launchActions {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Toast Notification
+   ========================================================================== */
+#toastBox {
+  position: absolute;
+  left: 50%;
+  bottom: 86px;
+  width: 660px;
+  margin-left: -330px;
+  padding: 18px 24px;
+  text-align: center;
+  z-index: 150;
+  border-radius: 28px;
+  background: rgba(24, 30, 48, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 26px;
+  font-weight: 600;
+  color: #ffffff;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65);
+  opacity: 0;
+  -webkit-transform: translateY(24px);
+  transform: translateY(24px);
+  -webkit-transition: opacity 0.3s ease, -webkit-transform 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+#toastBox.show {
+  opacity: 1;
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
 </style>
 </head>
 <body>
+
 <div id="stage">
-  <!-- Wallpapers + atmosphere -->
-  <div class="wall" id="wallA"></div>
-  <div class="wall" id="wallB"></div>
-  <div id="scrim"></div>
-  <div class="glow" id="glowA"></div>
-  <div class="glow" id="glowB"></div>
-  <div id="fx"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div id="pts"></div></div>
+  <!-- Dynamic Wallpapers & Ambiance -->
+  <div id="bgLayer"></div>
+  <div id="bgOverlay"></div>
+  <div id="glowCool"></div>
+  <div id="glowA" class="glowLayer"></div>
+  <div id="glowB" class="glowLayer"></div>
+  <div id="particlesContainer"></div>
 
-  <!-- Home content -->
-  <div id="rows">
-    <div id="rowsInner">
-      <div class="row hero" id="rowHero">
-        <div id="hello"></div>
-        <div id="clock"><span id="clkHM">00:00</span><span id="clkS">:00</span></div>
-        <div id="date"></div>
+  <!-- Top Navigation & System Status -->
+  <div id="topBar">
+    <div id="logoArea">
+      <div id="logoOrb"></div>
+      <div id="logoTitle">Aurora TV</div>
+      <div id="logoTag">Samsung Edition</div>
+    </div>
+    <div id="greetingBadge">Good Evening</div>
 
-        <div id="spot" class="glass">
-          <div id="spotTint"></div>
-          <div id="spotText">
-            <div id="spotTag"></div>
-            <div id="spotTitle"></div>
-            <div id="spotMeta"></div>
-            <div id="spotDesc"></div>
+    <div id="clockModule">
+      <!-- Clean WiFi icon SVG -->
+      <svg id="wifiStatus" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 8.5C6.5 4.5 17.5 4.5 22 8.5"></path>
+        <path d="M5.5 12C8.5 9 15.5 9 18.5 12"></path>
+        <path d="M9 16C10.5 14.5 13.5 14.5 15 16"></path>
+        <circle cx="12" cy="19" r="1" fill="#ffffff"></circle>
+      </svg>
+      <div id="clockTime">12:00</div>
+      <div id="clockDate">Monday<br>10 November</div>
+    </div>
+  </div>
+
+  <!-- Rows Container Viewport -->
+  <div id="rowsViewport">
+    <div id="rowsTrack">
+      <!-- Row 0: Hero Spotlight Row -->
+      <div class="tvRow heroRow" id="rowHero">
+        <div id="heroBanner">
+          <div id="heroBannerShine"></div>
+          <div id="heroTextPane">
+            <div id="heroBadge">FEATURED</div>
+            <h1 id="heroTitle">Aurora Universe</h1>
+            <div id="heroMeta">Sci-Fi &bull; 2026 &bull; 4K HDR &bull; 8 Episodes</div>
+            <div id="heroDesc">An epic voyage exploring the farthest celestial reaches of the galaxy, powered by next-generation liquid light engines.</div>
+            <div id="heroButtons">
+              <div class="heroBtn" id="btnPlayHero">&#9654; Play Now</div>
+              <div class="heroBtn" id="btnListHero">+ My List</div>
+            </div>
           </div>
-          <div id="spotBtns">
-            <div class="btn" id="btnPlay">&#9654;&nbsp; Play</div>
-            <div class="btn" id="btnList">+&nbsp; My List</div>
+          <div id="heroArtPane">
+            <div id="heroArtGrad"></div>
+            <div id="heroArtVisual" id="heroVisualBox">
+              <div class="orbArt" style="width:400px; height:400px; right:-80px; top:-80px; background:rgba(255,255,255,0.18);"></div>
+              <div class="orbArt" style="width:280px; height:280px; left:-60px; bottom:-60px; background:rgba(0,0,0,0.35);"></div>
+            </div>
           </div>
-          <div id="dots"></div>
+          <div id="heroDots"></div>
         </div>
+      </div>
+
+      <!-- Row 1: Apps Row -->
+      <div class="tvRow" id="rowApps">
+        <div class="rowHeading">Your Apps</div>
+        <div class="itemsTrack" id="appsTrack"></div>
+      </div>
+
+      <!-- Row 2: Continue Watching Row -->
+      <div class="tvRow" id="rowWatch">
+        <div class="rowHeading">Continue Watching</div>
+        <div class="itemsTrack" id="watchTrack"></div>
+      </div>
+
+      <!-- Row 3: Inputs & Settings Row -->
+      <div class="tvRow" id="rowSettings">
+        <div class="rowHeading">Inputs &amp; Settings</div>
+        <div class="itemsTrack" id="settingsTrack"></div>
       </div>
     </div>
   </div>
 
-  <div id="mini" class="glass">00:00</div>
-
-  <div id="hint">
-    <span><b>&#9664; &#9650; &#9660; &#9654;</b> Navigate</span>
-    <span><b>OK</b> Select</span>
-    <span><b>BACK</b> Home</span>
-    <span><b>BLUE</b> Next wallpaper</span>
-    <span><b>GREEN</b> Edit apps</span>
+  <!-- Remote Color Hint Bar -->
+  <div id="bottomHintBar">
+    <span class="remoteKeyHint"><span class="remotePill pillKey">&#9664; &#9650; &#9660; &#9654;</span> Navigate</span>
+    <span class="remoteKeyHint"><span class="remotePill pillKey">OK</span> Select</span>
+    <span class="remoteKeyHint"><span class="remotePill pillKey">BACK</span> Return</span>
+    <span class="remoteKeyHint" id="btnShortcutRed"><span class="remotePill pillRed">RED</span> Wallpapers</span>
+    <span class="remoteKeyHint" id="btnShortcutGreen"><span class="remotePill pillGreen">GREEN</span> Edit Apps</span>
+    <span class="remoteKeyHint" id="btnShortcutYellow"><span class="remotePill pillYellow">YELLOW</span> Effects: <span id="effectsStateLabel">On</span></span>
+    <span class="remoteKeyHint" id="btnShortcutBlue"><span class="remotePill pillBlue">BLUE</span> Next Wallpaper</span>
   </div>
 
-  <!-- Settings panels -->
-  <div id="panelLayer"><div id="panel" class="glass"></div></div>
+  <!-- Wallpaper Picker Modal -->
+  <div class="modalOverlay" id="wallpaperModal">
+    <div class="glassDialog">
+      <div class="dialogHeader">
+        <div>
+          <div class="dialogTitle">Select Wallpaper</div>
+          <div class="dialogSubtitle">Choose a built-in theme or supply a custom high-definition image URL</div>
+        </div>
+        <div class="dialogCloseBtn" id="btnCloseWpModal">Close (BACK)</div>
+      </div>
+      <div id="wallpaperGrid"></div>
+      <div class="customWpRow">
+        <input type="text" class="modalInput" id="customWpInput" placeholder="Enter custom image URL (https://...)" style="width: 820px; margin-right: 20px;">
+        <input type="text" class="modalInput" id="customWpNameInput" placeholder="Wallpaper Name" style="width: 260px; margin-right: 20px;">
+        <button class="actionBtn actionBtnPrimary" id="btnAddCustomWp">+ Add Wallpaper</button>
+      </div>
+    </div>
+  </div>
 
-  <!-- Launch overlay + toast -->
-  <div id="launch"><div class="box glass">
-    <div id="lBadge" class="badge"></div>
-    <div id="lName"></div>
-    <div id="lSub"></div>
-    <div class="spinner"></div>
-  </div></div>
-  <div id="toast"></div>
+  <!-- App Editor Modal -->
+  <div class="modalOverlay" id="appEditorModal">
+    <div class="glassDialog">
+      <div class="dialogHeader">
+        <div>
+          <div class="dialogTitle">Edit Applications</div>
+          <div class="dialogSubtitle">Add shortcuts, change launch URLs, reorder or restore default applications</div>
+        </div>
+        <div class="dialogCloseBtn" id="btnCloseAppModal">Close (BACK)</div>
+      </div>
+      <div class="editorColumns">
+        <div class="appListCol" id="appEditorList"></div>
+        <div class="appFormCol">
+          <div class="formSectionTitle" id="editorFormTitle">Add New Application</div>
+          <div class="formField">
+            <label class="formLabel">Application Name</label>
+            <input type="text" class="modalInput" id="appFormName" placeholder="e.g. Crunchyroll" style="width: 100%;">
+          </div>
+          <div class="formField">
+            <label class="formLabel">Launch URL</label>
+            <input type="text" class="modalInput" id="appFormUrl" placeholder="https://..." style="width: 100%;">
+          </div>
+          <div class="formField">
+            <label class="formLabel">Gradient Theme</label>
+            <div class="colorPickerRow" id="editorColorRow"></div>
+          </div>
+          <div style="margin-top: 24px;">
+            <button class="actionBtn actionBtnPrimary" id="btnSaveAppForm" style="width: 100%; margin-bottom: 12px;">Save Application</button>
+            <button class="actionBtn actionBtnSecondary" id="btnCancelEditApp" style="width: 100%; display: none;">Cancel Editing</button>
+          </div>
+        </div>
+      </div>
+      <div class="editorBottomBar">
+        <button class="actionBtn actionBtnDanger" id="btnRestoreDefaultApps">&#8635; Restore Default Apps</button>
+        <div style="color: rgba(255,255,255,0.5); font-size: 19px;">Remote buttons: Press OK on Move &#9664; / &#9654; to reorder apps</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Launch Confirmation Overlay -->
+  <div id="launchOverlay">
+    <div class="launchBox">
+      <div class="launchBigIcon" id="launchIcon"></div>
+      <div class="launchAppName" id="launchName">YouTube</div>
+      <div class="launchAppSub" id="launchSub">Opening application&hellip;</div>
+      <div class="launchSpinner"></div>
+      <div class="launchActions">
+        <button class="actionBtn actionBtnPrimary" id="btnLaunchNow" style="margin-right: 18px;">Open Now</button>
+        <button class="actionBtn actionBtnSecondary" id="btnLaunchCancel">Cancel (BACK)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Toast -->
+  <div id="toastBox"></div>
 </div>
 
 <script>
+/* ==========================================================================
+   Aurora TV Samsung Edition
+   Target: Samsung 2016 Smart TV (ES5 ONLY, No let/const, No arrow functions)
+   ========================================================================== */
 (function () {
   "use strict";
 
-  /* =====================================================================
-     CONFIG - edit freely.
-     Apps can also be edited on the TV: Inputs & Settings > Edit Apps
-     (or press the GREEN button / "E" on a keyboard).
-     Optional per-app field `appId` launches a native Tizen app when this
-     page runs as a packaged Tizen web app (ignored in the normal browser).
-     ===================================================================== */
-  var DEFAULT_APPS = [
-    { name: "YouTube",     url: "https://www.youtube.com/tv",       c: "#ff4d4d", icon: "play" },
-    { name: "Netflix",     url: "https://www.netflix.com",          c: "#ff3b4a", ch: "N" },
-    { name: "Prime Video", url: "https://www.primevideo.com",       c: "#38b6ff", icon: "tv" },
-    { name: "Disney+",     url: "https://www.disneyplus.com",       c: "#5b7cff", ch: "D" },
-    { name: "BBC iPlayer", url: "https://www.bbc.co.uk/iplayer",    c: "#ff5fa2", ch: "B" },
-    { name: "Twitch",      url: "https://www.twitch.tv",            c: "#a56bff", icon: "game" },
-    { name: "Spotify",     url: "https://open.spotify.com",         c: "#2ee86b", icon: "music" },
-    { name: "Plex",        url: "https://app.plex.tv",              c: "#ffb82e", ch: "X" },
-    { name: "Web",         url: "https://www.google.com",           c: "#7ee8fa", icon: "globe" }
-  ];
-  var MAX_APPS = 16, MAX_CUSTOM_WALLS = 6;
-  var PALETTE = ["#6aa8ff", "#9b7bff", "#ff7ad9", "#4ee1c1", "#ffb86a", "#ff6a7a"];
-
-  /* Default wallpapers are pure CSS gradients: zero downloads, tiny memory. */
-  var WALLS = [
-    { id: "d0", name: "Nebula", base: "#07060f",
-      css: "radial-gradient(ellipse at 18% 12%, rgba(120,80,255,.60) 0%, rgba(0,0,0,0) 55%), radial-gradient(ellipse at 88% 85%, rgba(0,140,255,.42) 0%, rgba(0,0,0,0) 55%), linear-gradient(160deg, #0b0a1e 0%, #04040a 100%)" },
-    { id: "d1", name: "Aurora", base: "#040a0d",
-      css: "radial-gradient(ellipse at 50% 0%, rgba(0,255,190,.36) 0%, rgba(0,0,0,0) 55%), radial-gradient(ellipse at 14% 58%, rgba(80,90,255,.38) 0%, rgba(0,0,0,0) 55%), radial-gradient(ellipse at 90% 62%, rgba(180,70,255,.32) 0%, rgba(0,0,0,0) 50%), linear-gradient(180deg, #05100f 0%, #03050a 100%)" },
-    { id: "d2", name: "Deep Ocean", base: "#030812",
-      css: "radial-gradient(ellipse at 50% 100%, rgba(0,170,255,.45) 0%, rgba(0,0,0,0) 60%), radial-gradient(ellipse at 12% 10%, rgba(40,80,255,.35) 0%, rgba(0,0,0,0) 50%), linear-gradient(180deg, #030a1a 0%, #02040b 100%)" },
-    { id: "d3", name: "Neon Horizon", base: "#06040c",
-      css: "linear-gradient(to top, rgba(255,60,200,.50) 0%, rgba(90,60,255,.26) 22%, rgba(0,0,0,0) 50%), repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0px, rgba(255,255,255,.045) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 64px), linear-gradient(180deg, #04030b 0%, #0b0722 100%)" },
-    { id: "d4", name: "Solar Flare", base: "#0b0508",
-      css: "radial-gradient(ellipse at 82% 14%, rgba(255,120,60,.50) 0%, rgba(0,0,0,0) 52%), radial-gradient(ellipse at 14% 88%, rgba(255,50,150,.40) 0%, rgba(0,0,0,0) 55%), linear-gradient(160deg, #14070d 0%, #06030a 100%)" },
-    { id: "d5", name: "Monolith", base: "#08090b",
-      css: "radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.14) 0%, rgba(0,0,0,0) 55%), linear-gradient(180deg, #14161b 0%, #060709 100%)" }
-  ];
-
-  var ICONS = {
-    play:    '<polygon points="8,5 19,12 8,19"/>',
-    tv:      '<rect x="2" y="4" width="20" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
-    music:   '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
-    game:    '<rect x="2" y="7" width="20" height="11" rx="5"/><line x1="7" y1="10" x2="7" y2="15"/><line x1="4.5" y1="12.5" x2="9.5" y2="12.5"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.5" cy="14" r="1"/>',
-    photo:   '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/>',
-    globe:   '<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><line x1="3" y1="12" x2="21" y2="12"/>',
-    sliders: '<line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2.2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="18" r="2.2"/>',
-    plug:    '<path d="M4 8h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><line x1="9" y1="3" x2="9" y2="8"/><line x1="15" y1="3" x2="15" y2="8"/>',
-    cast:    '<path d="M3 8V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M3 12a7 7 0 0 1 7 7"/><path d="M3 16a3 3 0 0 1 3 3"/>',
-    sound:   '<polygon points="3,9 7,9 12,5 12,19 7,15 3,15"/><path d="M16 8.5a5 5 0 0 1 0 7"/><path d="M19 6a9 9 0 0 1 0 12"/>',
-    pic:     '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8"/><path d="M7 12l3-3 3 3 2-2 2 2"/>',
-    sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
-    up:      '<polyline points="6,15 12,9 18,15"/>',
-    down:    '<polyline points="6,9 12,15 18,9"/>',
-    x:       '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
-    check:   '<polyline points="5,12 10,17 19,7"/>'
+  /* ---------- SVG Icons Library (Compact, ES5 Compatible) ---------- */
+  var SVG_ICONS = {
+    youtube: '<polygon points="10 8 16 12 10 16 10 8" fill="#fff"></polygon><rect x="3" y="5" width="18" height="14" rx="4" stroke="#fff" stroke-width="1.8" fill="none"></rect>',
+    netflix: '<path d="M5 4v16l6-10 6 10V4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>',
+    prime: '<path d="M4 14c4 4 12 4 16 0" stroke="#fff" stroke-width="2" fill="none"></path><path d="M16 11l4 3-1-4" stroke="#fff" stroke-width="2" fill="none"></path><rect x="4" y="5" width="16" height="6" rx="2" stroke="#fff" stroke-width="1.8" fill="none"></rect>',
+    disney: '<circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8" fill="none"></circle><path d="M7 14c2-4 8-4 10 0" stroke="#fff" stroke-width="1.8" fill="none"></path><circle cx="12" cy="8" r="1.5" fill="#fff"></circle>',
+    bbc: '<rect x="3" y="6" width="5" height="12" rx="1" fill="#fff"></rect><rect x="9.5" y="6" width="5" height="12" rx="1" fill="#fff"></rect><rect x="16" y="6" width="5" height="12" rx="1" fill="#fff"></rect>',
+    twitch: '<path d="M5 3h14v12l-4 4h-4l-3 3v-3H5V3z" stroke="#fff" stroke-width="1.8" fill="none"></path><line x1="10" y1="8" x2="10" y2="12" stroke="#fff" stroke-width="1.8"></line><line x1="14" y1="8" x2="14" y2="12" stroke="#fff" stroke-width="1.8"></line>',
+    spotify: '<circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8" fill="none"></circle><path d="M7.5 9.5c3-1 6-1 9 .5M8 12.5c2.5-.8 5-.8 7.5.5M9 15.5c2-.5 4-.5 6 .3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none"></path>',
+    plex: '<polygon points="5,4 12,12 5,20" fill="#fff"></polygon><polygon points="12,4 19,12 12,20" fill="none" stroke="#fff" stroke-width="2"></polygon>',
+    browser: '<circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8" fill="none"></circle><ellipse cx="12" cy="12" rx="4" ry="9" stroke="#fff" stroke-width="1.8" fill="none"></ellipse><line x1="3" y1="12" x2="21" y2="12" stroke="#fff" stroke-width="1.8"></line>',
+    plus: '<line x1="12" y1="5" x2="12" y2="19" stroke="#fff" stroke-width="2.5" stroke-linecap="round"></line><line x1="5" y1="12" x2="19" y2="12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"></line>',
+    play: '<polygon points="8,5 19,12 8,19" fill="#fff"></polygon>',
+    hdmi: '<rect x="4" y="6" width="16" height="12" rx="2" stroke="#fff" stroke-width="1.8" fill="none"></rect><line x1="8" y1="18" x2="8" y2="21" stroke="#fff" stroke-width="1.8"></line><line x1="16" y1="18" x2="16" y2="21" stroke="#fff" stroke-width="1.8"></line><line x1="6" y1="21" x2="18" y2="21" stroke="#fff" stroke-width="1.8"></line>',
+    cast: '<path d="M2 17a5 5 0 0 1 5 5M2 13a9 9 0 0 1 9 9M2 9a13 13 0 0 1 13 13M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>',
+    picture: '<rect x="3" y="4" width="18" height="14" rx="2" stroke="#fff" stroke-width="1.8" fill="none"></rect><circle cx="8" cy="9" r="1.5" fill="#fff"></circle><path d="M21 15l-5-5L7 18" stroke="#fff" stroke-width="1.8" fill="none"></path>',
+    sound: '<polygon points="4,9 8,9 13,5 13,19 8,15 4,15" fill="#fff"></polygon><path d="M16 9a4 4 0 0 1 0 6M18.5 7a7.5 7.5 0 0 1 0 10" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none"></path>',
+    palette: '<circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8" fill="none"></circle><circle cx="8" cy="10" r="1.2" fill="#fff"></circle><circle cx="12" cy="7" r="1.2" fill="#fff"></circle><circle cx="16" cy="10" r="1.2" fill="#fff"></circle><path d="M12 17c2 0 3-1 3-2 0-1-1-1.5-1-2.5 0-1 1-1.5 2-1.5" stroke="#fff" stroke-width="1.8" fill="none"></path>',
+    edit: '<path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>',
+    sparkles: '<path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5zM19 15l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z" stroke="#fff" stroke-width="1.6" fill="none"></path>'
   };
 
-  var HERO = [
-    { badge: "NEW SEASON", title: "Midnight Harbor", meta: "Thriller  \u2022  2026  \u2022  TV-MA  \u2022  8 Episodes",
-      desc: "When a lighthouse keeper vanishes during the worst storm in decades, a tired detective uncovers a town full of secrets.",
-      c1: "#ff5f6d" },
-    { badge: "ORIGINAL FILM", title: "The Long Orbit", meta: "Sci-Fi  \u2022  2026  \u2022  PG-13  \u2022  2h 04m",
-      desc: "Two astronauts, one failing station, and nine days of air. A breathtaking race home that asks what we leave behind.",
-      c1: "#4cc9ff" },
-    { badge: "DOCUMENTARY", title: "Wild Coasts", meta: "Nature  \u2022  2025  \u2022  TV-G  \u2022  6 Episodes",
-      desc: "Sail the planet's most dramatic shorelines in stunning 4K, from roaring Atlantic cliffs to quiet tropical reefs.",
-      c1: "#38ef7d" }
-  ];
-
-  var WATCH = [
-    { title: "Midnight Harbor",   sub: "S1 \u2022 E4  \u2022  32 min left", pct: 62, c1: "#ff5f6d", c2: "#3a1c71" },
-    { title: "Neon District",     sub: "S2 \u2022 E1  \u2022  48 min left", pct: 15, c1: "#f857a6", c2: "#1d1b4f" },
-    { title: "The Long Orbit",    sub: "Film  \u2022  1h 12m left",         pct: 40, c1: "#27c8ff", c2: "#0b1d57" },
-    { title: "Cooking with Fire", sub: "S3 \u2022 E7  \u2022  12 min left", pct: 78, c1: "#ffb347", c2: "#b3261e" },
-    { title: "Wild Coasts",       sub: "E2  \u2022  40 min left",           pct: 30, c1: "#38ef7d", c2: "#0b4d45" },
-    { title: "Quiet Hours",       sub: "Film  \u2022  1h 40m left",         pct: 8,  c1: "#a18cd1", c2: "#2b2d6e" }
-  ];
-
-  var SYS = [
-    { name: "HDMI 1",    icon: "plug",    c: "#6aa8ff", sub: "Input",              kind: "stub" },
-    { name: "HDMI 2",    icon: "plug",    c: "#8d7bff", sub: "Input",              kind: "stub" },
-    { name: "Mirroring", icon: "cast",    c: "#ff7ad9", sub: "Screen mirroring",   kind: "stub" },
-    { name: "Picture",   icon: "pic",     c: "#ffb86a", sub: "Picture settings",   kind: "stub" },
-    { name: "Sound",     icon: "sound",   c: "#7ee8fa", sub: "Sound settings",     kind: "stub" },
-    { name: "Wallpaper", icon: "photo",   c: "#9b7bff", sub: "Backgrounds",        kind: "wall" },
-    { name: "Edit Apps", icon: "sliders", c: "#4ee1c1", sub: "Names and links",    kind: "apps" },
-    { name: "Effects",   icon: "sparkle", c: "#ffffff", sub: "Animated effects",   kind: "fx" }
-  ];
-
-  /* =====================================================================
-     Helpers (ES5 only)
-     ===================================================================== */
-  function $(id) { return document.getElementById(id); }
-  function mk(tag, cls, html) { var e = document.createElement(tag); if (cls) { e.className = cls; } if (html !== undefined) { e.innerHTML = html; } return e; }
-  function hasC(el, c) { return (" " + el.className + " ").indexOf(" " + c + " ") > -1; }
-  function addC(el, c) { if (!hasC(el, c)) { el.className = el.className ? el.className + " " + c : c; } }
-  function remC(el, c) { el.className = (" " + el.className + " ").split(" " + c + " ").join(" ").replace(/^\s+|\s+$/g, "").replace(/\s{2,}/g, " "); }
-  function setT(el, v) { el.style.webkitTransform = v; el.style.transform = v; }
-  function setBG(el, css) { el.style.backgroundImage = css; }
-  function pad(n) { return n < 10 ? "0" + n : "" + n; }
-  function rgba(hex, a) {
-    var n = parseInt(hex.charAt(0) === "#" ? hex.substr(1) : hex, 16);
-    return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
-  }
-  function svg(n) {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + ICONS[n] + '</svg>';
-  }
-  function hostOf(u) {
-    var m = /^[a-z][a-z0-9+.\-]*:\/\/([^\/?#]+)/i.exec(u || "");
-    return m ? m[1].replace(/^www\./i, "") : (u || "");
-  }
-  function normUrl(u) {
-    u = (u || "").replace(/^\s+|\s+$/g, "");
-    if (!u || u === "https://" || u === "http://") { return ""; }
-    if (/^(javascript|data|vbscript):/i.test(u)) { return ""; }
-    if (!/^[a-z][a-z0-9+.\-]*:/i.test(u)) { u = "https://" + u; }
-    return u;
-  }
-  function load(k, d) {
-    try { var v = window.localStorage.getItem("aurora." + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; }
-  }
-  function save(k, v) {
-    try { window.localStorage.setItem("aurora." + k, JSON.stringify(v)); return true; } catch (e) { return false; }
-  }
-  function preload(url, ok, fail) {
-    var im = new Image(), done = false;
-    im.onload = function () { if (!done) { done = true; ok(); } };
-    im.onerror = function () { if (!done) { done = true; fail(); } };
-    setTimeout(function () { if (!done) { done = true; fail(); } }, 12000);
-    im.src = url;
-  }
-  function setBadge(el, spec) {
-    el.innerHTML = "";
-    var c = spec.c || "#8fa4ff";
-    setBG(el, "linear-gradient(135deg, " + rgba(c, .62) + ", " + rgba(c, .16) + ")");
-    if (spec.icon) { el.innerHTML = svg(spec.icon); }
-    else {
-      var s = mk("span", "ltr");
-      s.textContent = spec.ch || (spec.name || "?").charAt(0).toUpperCase();
-      el.appendChild(s);
+  /* ---------- Default Data Models ---------- */
+  var DEFAULT_WALLPAPERS = [
+    {
+      id: "aurora",
+      name: "Aurora Borealis",
+      type: "gradient",
+      css: "linear-gradient(135deg, #091a28 0%, #050b18 50%, #0e2b26 100%)",
+      c1: "#1de9b6",
+      c2: "#0d47a1"
+    },
+    {
+      id: "midnight",
+      name: "Midnight Eclipse",
+      type: "gradient",
+      css: "linear-gradient(145deg, #0f1226 0%, #060810 55%, #180928 100%)",
+      c1: "#7c4dff",
+      c2: "#1a237e"
+    },
+    {
+      id: "violet",
+      name: "Liquid Violet",
+      type: "gradient",
+      css: "linear-gradient(140deg, #1b0a2a 0%, #090614 55%, #2a0b18 100%)",
+      c1: "#e040fb",
+      c2: "#4a148c"
+    },
+    {
+      id: "cyber",
+      name: "Cyber Horizon",
+      type: "gradient",
+      css: "linear-gradient(135deg, #0a1f33 0%, #060d1a 50%, #1f1430 100%)",
+      c1: "#00e5ff",
+      c2: "#ff3d00"
+    },
+    {
+      id: "nebula",
+      name: "Cosmic Nebula",
+      type: "gradient",
+      css: "linear-gradient(150deg, #1f0d24 0%, #090912 50%, #091a2d 100%)",
+      c1: "#ff4081",
+      c2: "#304ffe"
+    },
+    {
+      id: "oled",
+      name: "OLED Stealth Black",
+      type: "gradient",
+      css: "linear-gradient(180deg, #000000 0%, #080808 100%)",
+      c1: "#607d8b",
+      c2: "#263238"
     }
-  }
+  ];
 
-  /* =====================================================================
-     Scaling to the screen
-     ===================================================================== */
+  var DEFAULT_APPS = [
+    { id: "yt", name: "YouTube", icon: "youtube", url: "https://www.youtube.com/tv", c1: "#e50914", c2: "#8a0000" },
+    { id: "nf", name: "Netflix", icon: "netflix", url: "https://www.netflix.com", c1: "#e50914", c2: "#3d0305" },
+    { id: "pv", name: "Prime Video", icon: "prime", url: "https://www.primevideo.com", c1: "#00a8e1", c2: "#003254" },
+    { id: "dp", name: "Disney+", icon: "disney", url: "https://www.disneyplus.com", c1: "#113ccf", c2: "#09173d" },
+    { id: "bbc", name: "BBC iPlayer", icon: "bbc", url: "https://www.bbc.co.uk/iplayer", c1: "#f54997", c2: "#780b39" },
+    { id: "tw", name: "Twitch", icon: "twitch", url: "https://www.twitch.tv", c1: "#9146ff", c2: "#3f1082" },
+    { id: "sp", name: "Spotify", icon: "spotify", url: "https://open.spotify.com", c1: "#1db954", c2: "#0e4f24" },
+    { id: "px", name: "Plex", icon: "plex", url: "https://app.plex.tv", c1: "#e5a00d", c2: "#694200" },
+    { id: "wb", name: "Web Browser", icon: "browser", url: "https://www.google.com", c1: "#4285f4", c2: "#174ea6" }
+  ];
+
+  var HERO_ITEMS = [
+    {
+      badge: "ORIGINAL SERIES",
+      title: "Midnight Harbor",
+      meta: "Drama &bull; 2026 &bull; 4K HDR &bull; Season 2",
+      desc: "When a beacon in the outer fog flashes a forbidden code, an isolated coastal town is drawn into a high-stakes maritime conspiracy.",
+      c1: "#ff5252",
+      c2: "#311b92"
+    },
+    {
+      badge: "FEATURE FILM",
+      title: "The Long Orbit",
+      meta: "Sci-Fi &bull; 2026 &bull; 2h 12m &bull; Dolby Atmos",
+      desc: "Two deep-space engineers make a perilous journey back to Earth after their orbital tether experiences sudden atmospheric drag.",
+      c1: "#00e5ff",
+      c2: "#0d47a1"
+    },
+    {
+      badge: "DOCUMENTARY",
+      title: "Wild Aurora",
+      meta: "Nature &bull; 2025 &bull; 6 Episodes &bull; Ultra HD",
+      desc: "Witness the majestic sub-zero wildlife living under the world's most vibrant polar geomagnetic displays.",
+      c1: "#69f0ae",
+      c2: "#004d40"
+    }
+  ];
+
+  var WATCH_ITEMS = [
+    { title: "Midnight Harbor", sub: "S2 &bull; E3 &bull; 28m left", pct: 68, c1: "#ff5252", c2: "#311b92" },
+    { title: "The Long Orbit", sub: "Movie &bull; 1h 04m left", pct: 45, c1: "#00e5ff", c2: "#0d47a1" },
+    { title: "Neon Cyberpunk", sub: "S1 &bull; E5 &bull; 14m left", pct: 82, c1: "#e040fb", c2: "#4a148c" },
+    { title: "Wild Aurora", sub: "E1 &bull; 42m left", pct: 20, c1: "#69f0ae", c2: "#004d40" },
+    { title: "Deep Sea Frontiers", sub: "S1 &bull; E2 &bull; 35m left", pct: 54, c1: "#00b0ff", c2: "#002171" },
+    { title: "Solar Storms", sub: "Film &bull; 1h 22m left", pct: 10, c1: "#ffd600", c2: "#e65100" }
+  ];
+
+  var SYSTEM_ITEMS = [
+    { id: "hdmi1", name: "HDMI 1", sub: "Game Console", icon: "hdmi", c1: "#00e5ff", c2: "#005b96" },
+    { id: "hdmi2", name: "HDMI 2", sub: "Set-top Box", icon: "hdmi", c1: "#69f0ae", c2: "#0b6623" },
+    { id: "mirror", name: "Mirroring", sub: "Screen Cast", icon: "cast", c1: "#e040fb", c2: "#6a0080" },
+    { id: "picture", name: "Picture", sub: "Cinema Mode", icon: "picture", c1: "#ffd600", c2: "#b26a00" },
+    { id: "sound", name: "Sound", sub: "Stereo DTS", icon: "sound", c1: "#7c4dff", c2: "#303f9f" },
+    { id: "wallpaper", name: "Wallpapers", sub: "Change Look", icon: "palette", c1: "#ff4081", c2: "#c51162" },
+    { id: "editapps", name: "Edit Apps", sub: "Customize", icon: "edit", c1: "#00e676", c2: "#1b5e20" },
+    { id: "effects", name: "Effects", sub: "Toggle Ambiance", icon: "sparkles", c1: "#ffab00", c2: "#ff6f00" }
+  ];
+
+  var COLOR_PRESETS = [
+    { c1: "#e50914", c2: "#8a0000" },
+    { c1: "#00a8e1", c2: "#003254" },
+    { c1: "#113ccf", c2: "#09173d" },
+    { c1: "#9146ff", c2: "#3f1082" },
+    { c1: "#1db954", c2: "#0e4f24" },
+    { c1: "#e5a00d", c2: "#694200" },
+    { c1: "#ff4081", c2: "#c51162" },
+    { c1: "#00e5ff", c2: "#0d47a1" }
+  ];
+
+  /* ---------- DOM Element Cache ---------- */
+  function $(id) { return document.getElementById(id); }
+
   var stage = $("stage");
-  function fit() {
-    var w = window.innerWidth || document.documentElement.clientWidth;
-    var h = window.innerHeight || document.documentElement.clientHeight;
-    setT(stage, "scale(" + Math.min(w / 1920, h / 1080) + ")");
-  }
-  window.onresize = fit;
-  fit();
-
-  /* =====================================================================
-     Toast
-     ===================================================================== */
+  var bgLayer = $("bgLayer");
+  var glowA = $("glowA");
+  var glowB = $("glowB");
+  var rowsTrack = $("rowsTrack");
+  var appsTrack = $("appsTrack");
+  var watchTrack = $("watchTrack");
+  var settingsTrack = $("settingsTrack");
+  var toastBox = $("toastBox");
   var toastTimer = null;
-  function toast(msg) {
-    var t = $("toast");
-    t.textContent = msg;
-    t.className = "show";
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.className = ""; }, 2200);
+
+  /* ---------- State ---------- */
+  var userApps = [];
+  var userWallpapers = [];
+  var currentWallpaperId = "aurora";
+  var effectsEnabled = true;
+  var heroIndex = 0;
+  var heroTimer = null;
+  var currentGlowFlip = 0;
+  var lastGlowColor = "";
+
+  // Navigation Grid State
+  // row 0: Hero buttons (Play, My List)
+  // row 1: Apps
+  // row 2: Continue Watching
+  // row 3: Settings
+  var nav = {
+    row: 0,
+    col: 0,
+    modal: null, // null | 'wallpaper' | 'appEditor' | 'launch'
+    modalIndex: 0
+  };
+
+  var rowItems = [[], [], [], []]; // Cached item elements
+
+  /* ---------- Viewport Auto-Scaling (Fit to 1920x1080) ---------- */
+  function fitStage() {
+    var winW = window.innerWidth || document.documentElement.clientWidth || 1920;
+    var winH = window.innerHeight || document.documentElement.clientHeight || 1080;
+    var scale = Math.min(winW / 1920, winH / 1080);
+    var transformVal = "scale(" + scale + ")";
+    stage.style.webkitTransform = transformVal;
+    stage.style.transform = transformVal;
+  }
+  window.onresize = fitStage;
+  fitStage();
+
+  /* ---------- Helper Utilities ---------- */
+  function getSvg(name) {
+    var content = SVG_ICONS[name] || SVG_ICONS.browser;
+    return '<svg viewBox="0 0 24 24" class="appIconSvg">' + content + '</svg>';
   }
 
-  /* =====================================================================
-     Clock (updates every second, only touches the DOM when text changes)
-     ===================================================================== */
+  function setElementTransform(el, val) {
+    el.style.webkitTransform = val;
+    el.style.transform = val;
+  }
+
+  function setGradient(el, c1, c2) {
+    var css = "linear-gradient(135deg, " + c1 + " 0%, " + c2 + " 100%)";
+    el.style.background = "-webkit-" + css;
+    el.style.background = css;
+  }
+
+  function showToast(message) {
+    toastBox.innerHTML = message;
+    toastBox.className = "show";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toastBox.className = "";
+    }, 2400);
+  }
+
+  function hexToRgba(hex, alpha) {
+    if (!hex) { return "rgba(0,0,0," + alpha + ")"; }
+    var clean = hex.charAt(0) === "#" ? hex.substring(1) : hex;
+    if (clean.length === 3) {
+      clean = clean.charAt(0) + clean.charAt(0) + clean.charAt(1) + clean.charAt(1) + clean.charAt(2) + clean.charAt(2);
+    }
+    var num = parseInt(clean, 16);
+    var r = (num >> 16) & 255;
+    var g = (num >> 8) & 255;
+    var b = num & 255;
+    return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+  }
+
+  /* ---------- Clock & Greeting ---------- */
   var DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  var lastHM = "", lastSec = "";
-  function tick() {
-    var d = new Date(), h = d.getHours();
-    var hm = pad(h) + ":" + pad(d.getMinutes()), ss = ":" + pad(d.getSeconds());
-    if (ss !== lastSec) { lastSec = ss; $("clkS").textContent = ss; }
-    if (hm !== lastHM) {
-      lastHM = hm;
-      $("clkHM").textContent = hm;
-      $("mini").textContent = hm;
-      $("date").textContent = DAYS[d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear();
-      $("hello").textContent = h < 5 ? "Good night" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+
+  function padZero(num) {
+    return num < 10 ? "0" + num : "" + num;
+  }
+
+  function updateClock() {
+    var now = new Date();
+    var hrs = now.getHours();
+    var mins = now.getMinutes();
+    $("clockTime").innerHTML = padZero(hrs) + ":" + padZero(mins);
+    $("clockDate").innerHTML = DAYS[now.getDay()] + "<br>" + now.getDate() + " " + MONTHS[now.getMonth()];
+
+    var greeting = "Good Night";
+    if (hrs >= 5 && hrs < 12) { greeting = "Good Morning"; }
+    else if (hrs >= 12 && hrs < 18) { greeting = "Good Afternoon"; }
+    else if (hrs >= 18 && hrs < 23) { greeting = "Good Evening"; }
+    $("greetingBadge").innerHTML = greeting;
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+
+  /* ---------- Ambient Glow Cross-fader ---------- */
+  function setAmbientGlow(color) {
+    if (!effectsEnabled || !color || color === lastGlowColor) { return; }
+    lastGlowColor = color;
+    var glows = [glowA, glowB];
+    var current = glows[currentGlowFlip];
+    var other = glows[1 - currentGlowFlip];
+
+    var radialCss = "radial-gradient(ellipse at center, " + hexToRgba(color, 0.45) + " 0%, rgba(0,0,0,0) 70%)";
+    current.style.background = "-webkit-" + radialCss;
+    current.style.background = radialCss;
+    current.className = "glowLayer on";
+    other.className = "glowLayer";
+    currentGlowFlip = 1 - currentGlowFlip;
+  }
+
+  /* ---------- Floating Particles Generator ---------- */
+  function setupParticles() {
+    var container = $("particlesContainer");
+    container.innerHTML = "";
+    for (var i = 0; i < 16; i++) {
+      var p = document.createElement("div");
+      p.className = "particle";
+      var size = Math.floor(Math.random() * 5) + 3;
+      p.style.width = size + "px";
+      p.style.height = size + "px";
+      p.style.left = Math.floor(Math.random() * 1900) + "px";
+      p.style.top = Math.floor(Math.random() * 1060) + "px";
+      p.style.webkitAnimationDelay = (Math.random() * 12).toFixed(1) + "s";
+      p.style.animationDelay = (Math.random() * 12).toFixed(1) + "s";
+      p.style.webkitAnimationDuration = (10 + Math.random() * 12).toFixed(1) + "s";
+      p.style.animationDuration = (10 + Math.random() * 12).toFixed(1) + "s";
+      container.appendChild(p);
     }
   }
-  tick();
-  setInterval(tick, 1000);
 
-  /* =====================================================================
-     Accent glow (two layers cross-fading, follows the focused tile)
-     ===================================================================== */
-  var glows = [$("glowA"), $("glowB")], glowFlip = 0, glowColor = "";
-  function setGlow(color) {
-    if (color === glowColor) { return; }
-    glowColor = color;
-    var next = glows[glowFlip], prev = glows[1 - glowFlip];
-    setBG(next, "radial-gradient(ellipse at center, " + rgba(color, .36) + " 0%, rgba(0,0,0,0) 66%)");
-    next.className = "glow on";
-    prev.className = "glow";
-    glowFlip = 1 - glowFlip;
-  }
-
-  /* =====================================================================
-     Animated effects
-     ===================================================================== */
-  var fxOn = load("fx", true) !== false;
-  function applyFx() { document.body.className = fxOn ? "" : "fx-off"; }
-  (function makeParticles() {
-    var box = $("pts"), i, p, s, dur, del;
-    for (i = 0; i < 16; i++) {
-      p = mk("div", "pt");
-      s = 6 + Math.floor(Math.random() * 12);
-      p.style.width = s + "px"; p.style.height = s + "px";
-      p.style.left = Math.floor(Math.random() * 1880) + "px";
-      dur = (22 + Math.random() * 26).toFixed(1) + "s";
-      del = "-" + (Math.random() * 40).toFixed(1) + "s";
-      p.style.webkitAnimationDuration = dur; p.style.animationDuration = dur;
-      p.style.webkitAnimationDelay = del; p.style.animationDelay = del;
-      box.appendChild(p);
+  function setEffectsState(on) {
+    effectsEnabled = on;
+    try {
+      localStorage.setItem("aurora_effects_enabled", on ? "1" : "0");
+    } catch (e) {}
+    $("effectsStateLabel").innerHTML = on ? "On" : "Off";
+    if (on) {
+      $("particlesContainer").className = "";
+      setAmbientGlow(HERO_ITEMS[heroIndex].c1);
+    } else {
+      $("particlesContainer").className = "disabled";
+      glowA.className = "glowLayer";
+      glowB.className = "glowLayer";
     }
-  })();
-  applyFx();
+  }
 
-  /* =====================================================================
-     Wallpapers
-     ===================================================================== */
-  var customWalls = load("walls", []);
-  if (!customWalls || !customWalls.length || typeof customWalls.push !== "function") { customWalls = []; }
-  var wallEls = [$("wallA"), $("wallB")], wallFlip = 0, wallId = null, wallTok = 0;
+  /* ---------- Wallpaper System ---------- */
+  function loadWallpaperState() {
+    try {
+      var savedId = localStorage.getItem("aurora_wallpaper_id");
+      if (savedId) { currentWallpaperId = savedId; }
+      var customStr = localStorage.getItem("aurora_custom_wallpapers");
+      if (customStr) {
+        userWallpapers = JSON.parse(customStr);
+      }
+    } catch (e) {
+      userWallpapers = [];
+    }
+    applyWallpaper(currentWallpaperId);
+  }
 
-  function allWalls() { return WALLS.concat(customWalls); }
-  function findWall(id) {
-    var l = allWalls(), i;
-    for (i = 0; i < l.length; i++) { if (l[i].id === id) { return l[i]; } }
-    return null;
+  function getAllWallpapers() {
+    var all = [];
+    var i;
+    for (i = 0; i < DEFAULT_WALLPAPERS.length; i++) {
+      all.push(DEFAULT_WALLPAPERS[i]);
+    }
+    for (i = 0; i < userWallpapers.length; i++) {
+      all.push(userWallpapers[i]);
+    }
+    return all;
   }
-  function paintWall(el, w) {
-    el.style.backgroundImage = "none";
-    el.style.backgroundColor = w.base || "#05060a";
-    if (w.url) { el.style.backgroundImage = 'url("' + String(w.url).replace(/"/g, "%22") + '")'; }
-    else { el.style.backgroundImage = w.css; }
-  }
-  function showWall(w, quiet) {
-    var nxt = wallEls[wallFlip], prv = wallEls[1 - wallFlip];
-    paintWall(nxt, w);
-    nxt.className = "wall on";
-    prv.className = "wall";
-    wallFlip = 1 - wallFlip;
-    wallId = w.id;
-    save("wall", w.id);
-    refreshTicks();
-    if (!quiet) { toast("Wallpaper: " + w.name); }
-  }
-  function setWallpaper(id, quiet) {
-    var w = findWall(id) || WALLS[0], tok = ++wallTok;
-    if (w.url) {
-      preload(w.url, function () { if (tok === wallTok) { showWall(w, quiet); } },
-        function () { toast("Couldn't load that wallpaper"); if (wallId === null) { showWall(WALLS[0], true); } });
-    } else { showWall(w, quiet); }
-  }
-  function nextWallpaper() {
-    var l = allWalls(), i, idx = 0;
-    for (i = 0; i < l.length; i++) { if (l[i].id === wallId) { idx = i; } }
-    setWallpaper(l[(idx + 1) % l.length].id, false);
-  }
-  function saveWalls() { return save("walls", customWalls); }
 
-  /* =====================================================================
-     Apps (stored in localStorage, editable on screen)
-     ===================================================================== */
-  function cloneApps() { return JSON.parse(JSON.stringify(DEFAULT_APPS)); }
-  var apps = load("apps", null);
-  (function normaliseApps() {
-    var out = [], i, a;
-    if (apps && apps.length) {
-      for (i = 0; i < apps.length; i++) {
-        a = apps[i];
-        if (a && typeof a.name === "string" && typeof a.url === "string") {
-          if (!a.c) { a.c = PALETTE[i % PALETTE.length]; }
-          out.push(a);
-        }
+  function applyWallpaper(id) {
+    var all = getAllWallpapers();
+    var found = null;
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].id === id) {
+        found = all[i];
+        break;
       }
     }
-    apps = out.length ? out : cloneApps();
-  })();
-
-  /* =====================================================================
-     Home rows
-     ===================================================================== */
-  var inner = $("rowsInner"), rows = [], cur = { r: 0, i: 0 };
-
-  function makeRow(title) {
-    var el = mk("div", "row"), t = mk("div", "rowTitle"), track = mk("div", "track");
-    t.innerHTML = title;
-    el.appendChild(t); el.appendChild(track);
-    inner.appendChild(el);
-    var row = { el: el, track: track, items: [], idx: 0, hero: false, off: 0 };
-    rows.push(row);
-    return row;
-  }
-  function addItem(row, el, type, data, color) {
-    el.appendChild(mk("div", "ring"));
-    var d = (row.items.length * 0.06 + 0.1) + "s";
-    el.style.webkitAnimationDelay = d; el.style.animationDelay = d;
-    row.track.appendChild(el);
-    var rr = rows.indexOf(row), ii = row.items.length;
-    var item = { el: el, type: type, data: data, color: color };
-    row.items.push(item);
-    el.onclick = function () { setFocus(rr, ii); activate(); };
-    return item;
-  }
-
-  // Row 0: hero (clock + spotlight buttons)
-  (function () {
-    var r = { el: $("rowHero"), track: null, items: [], idx: 0, hero: true, off: 0 };
-    r.items.push({ el: $("btnPlay"), type: "play", data: null, color: null });
-    r.items.push({ el: $("btnList"), type: "list", data: null, color: null });
-    r.items[0].el.appendChild(mk("div", "ring"));
-    r.items[1].el.appendChild(mk("div", "ring"));
-    r.items[0].el.onclick = function () { setFocus(0, 0); activate(); };
-    r.items[1].el.onclick = function () { setFocus(0, 1); activate(); };
-    rows.push(r);
-  })();
-
-  var rApps = makeRow("Apps");
-  var rWatch = makeRow("Continue Watching");
-  var rSys = makeRow("Inputs &amp; Settings");
-
-  function buildApps() {
-    var r = rApps, i, a, el, face, acc, badge, nm, host;
-    r.track.innerHTML = ""; r.items = []; r.off = 0;
-    setT(r.track, "translateX(0px)");
-    for (i = 0; i < apps.length; i++) {
-      a = apps[i];
-      el = mk("div", "tile app");
-      face = mk("div", "face");
-      acc = mk("div", "acc");
-      setBG(acc, "radial-gradient(circle at center, " + rgba(a.c, .55) + " 0%, rgba(0,0,0,0) 68%)");
-      face.appendChild(acc); el.appendChild(face);
-      badge = mk("div", "badge"); setBadge(badge, { icon: a.icon, ch: a.ch, name: a.name, c: a.c });
-      nm = mk("div", "name"); nm.textContent = a.name;
-      host = mk("div", "host"); host.textContent = hostOf(a.url);
-      el.appendChild(badge); el.appendChild(nm); el.appendChild(host);
-      addItem(r, el, "app", a, a.c);
+    if (!found) {
+      found = DEFAULT_WALLPAPERS[0];
+      id = found.id;
     }
-  }
+    currentWallpaperId = id;
+    try {
+      localStorage.setItem("aurora_wallpaper_id", id);
+    } catch (e) {}
 
-  (function buildWatch() {
-    var i, w, el, face;
-    for (i = 0; i < WATCH.length; i++) {
-      w = WATCH[i];
-      el = mk("div", "tile watch");
-      face = mk("div", "face");
-      setBG(face, "linear-gradient(135deg, " + rgba(w.c1, .78) + " 0%, " + rgba(w.c2, .92) + " 100%)");
-      el.appendChild(face);
-      el.insertAdjacentHTML("beforeend",
-        '<div class="orb"></div><div class="shade"></div><div class="play"></div>' +
-        '<div class="title"></div><div class="sub"></div><div class="bar"><i style="width:' + w.pct + '%"></i></div>');
-      el.querySelector(".title").textContent = w.title;
-      el.querySelector(".sub").textContent = w.sub.replace(/  /g, " ");
-      addItem(rWatch, el, "watch", w, w.c1);
-    }
-  })();
-
-  (function buildSys() {
-    var i, s, el, face, badge, nm, item;
-    for (i = 0; i < SYS.length; i++) {
-      s = SYS[i];
-      el = mk("div", "tile sys");
-      face = mk("div", "face"); el.appendChild(face);
-      badge = mk("div", "badge"); setBadge(badge, { icon: s.icon, c: s.c });
-      nm = mk("div", "name"); nm.textContent = s.name;
-      el.appendChild(badge); el.appendChild(nm);
-      item = addItem(rSys, el, "sys", s, s.c);
-      item.nameEl = nm;
-    }
-  })();
-
-  function updateFxLabel() {
-    var i;
-    for (i = 0; i < rSys.items.length; i++) {
-      if (rSys.items[i].data.kind === "fx") { rSys.items[i].nameEl.textContent = "Effects: " + (fxOn ? "On" : "Off"); }
-    }
-  }
-  function toggleFx() {
-    fxOn = !fxOn; applyFx(); save("fx", fxOn); updateFxLabel();
-    toast("Animated effects " + (fxOn ? "on" : "off"));
-  }
-
-  buildApps();
-  updateFxLabel();
-
-  /* =====================================================================
-     Spotlight rotation
-     ===================================================================== */
-  var heroIdx = 0, heroTimer = null, dotsEl = $("dots"), i0;
-  for (i0 = 0; i0 < HERO.length; i0++) { dotsEl.appendChild(document.createElement("i")); }
-
-  function paintHero(n) {
-    var h = HERO[n], d = dotsEl.childNodes, k;
-    $("spotTag").textContent = h.badge;
-    $("spotTitle").textContent = h.title;
-    $("spotMeta").textContent = h.meta;
-    $("spotDesc").textContent = h.desc;
-    setBG($("spotTint"), "radial-gradient(ellipse at 100% 0%, " + rgba(h.c1, .55) + " 0%, rgba(0,0,0,0) 62%)");
-    for (k = 0; k < d.length; k++) { d[k].className = (k === n) ? "on" : ""; }
-    if (cur.r === 0) { setGlow(h.c1); }
-  }
-  function setHero(n) {
-    heroIdx = n;
-    $("spotText").className = "out"; $("spotTint").className = "out";
-    setTimeout(function () { paintHero(n); $("spotText").className = ""; $("spotTint").className = ""; }, 350);
-  }
-  function startHero() {
-    clearInterval(heroTimer);
-    heroTimer = setInterval(function () { setHero((heroIdx + 1) % HERO.length); }, 9000);
-  }
-
-  /* =====================================================================
-     Focus + scrolling on the home screen
-     ===================================================================== */
-  function scrollRow(r) {
-    var y = r === 0 ? 0 : rows[1].el.offsetTop - 50;
-    setT(inner, "translateY(" + (-y) + "px)");
-    if (r > 0) { addC($("mini"), "on"); } else { remC($("mini"), "on"); }
-  }
-  function scrollTrack(r, i) {
-    var row = rows[r];
-    if (!row.track) { return; }
-    var it = row.items[i].el, off = row.off || 0, left = it.offsetLeft, right = left + it.offsetWidth;
-    if (right - off > 1810) { off = right - 1810; }
-    if (left - off < 110) { off = left - 110; }
-    if (off < 0) { off = 0; }
-    row.off = off;
-    setT(row.track, "translateX(" + (-off) + "px)");
-  }
-  function setFocus(r, i) {
-    var old = rows[cur.r].items[cur.i], k;
-    if (old) { remC(old.el, "focused"); }
-    for (k = 0; k < rows.length; k++) { remC(rows[k].el, "active"); }
-    cur.r = r; cur.i = i;
-    rows[r].idx = i;
-    var it = rows[r].items[i];
-    addC(it.el, "focused");
-    if (!rows[r].hero) { addC(rows[r].el, "active"); }
-    scrollRow(r);
-    scrollTrack(r, i);
-    setGlow(it.color || HERO[heroIdx].c1);
-  }
-
-  /* =====================================================================
-     Launch overlay + actions
-     ===================================================================== */
-  var launchEl = $("launch"), launching = false, launchTimer = null;
-
-  function openLaunch(name, sub, color, spec, url) {
-    launching = true;
-    setBadge($("lBadge"), { icon: spec.icon, ch: spec.ch, name: name, c: color });
-    $("lName").textContent = name;
-    $("lSub").textContent = sub;
-    launchEl.className = "show";
-    clearTimeout(launchTimer);
-    if (url) {
-      launchTimer = setTimeout(function () {
-        window.location.href = url;
-        launchTimer = setTimeout(closeLaunch, 7000);
-      }, 900);
+    if (found.type === "image") {
+      bgLayer.style.background = "url('" + found.url + "') center center / cover no-repeat";
     } else {
-      launchTimer = setTimeout(closeLaunch, 2600);
+      bgLayer.style.background = found.css;
     }
+    setAmbientGlow(found.c1);
   }
-  function closeLaunch() {
-    clearTimeout(launchTimer);
-    launchEl.className = "";
-    launching = false;
-  }
-  function launchApp(a) {
-    var url = normUrl(a.url);
-    function web() {
-      if (!url) { toast("No link set for " + a.name); return; }
-      openLaunch(a.name, "Opening " + hostOf(url) + "\u2026", a.c, a, url);
+
+  function cycleNextWallpaper() {
+    var all = getAllWallpapers();
+    var nextIdx = 0;
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].id === currentWallpaperId) {
+        nextIdx = (i + 1) % all.length;
+        break;
+      }
     }
-    if (a.appId && window.tizen && window.tizen.application) {
-      try { window.tizen.application.launch(a.appId, null, web); return; } catch (e) {}
+    applyWallpaper(all[nextIdx].id);
+    showToast("Wallpaper: " + all[nextIdx].name);
+  }
+
+  /* ---------- Apps Persistence & Management ---------- */
+  function loadAppsState() {
+    try {
+      var saved = localStorage.getItem("aurora_user_apps");
+      if (saved) {
+        userApps = JSON.parse(saved);
+      } else {
+        userApps = JSON.parse(JSON.stringify(DEFAULT_APPS));
+      }
+    } catch (e) {
+      userApps = JSON.parse(JSON.stringify(DEFAULT_APPS));
     }
-    web();
-  }
-  function activate() {
-    var it = rows[cur.r].items[cur.i], d = it.data;
-    if (it.type === "play") {
-      var h = HERO[heroIdx];
-      openLaunch(h.title, "Starting playback\u2026", h.c1, { icon: "play" }, null);
-    } else if (it.type === "list") {
-      toast("Added \u201C" + HERO[heroIdx].title + "\u201D to My List");
-    } else if (it.type === "app") {
-      launchApp(d);
-    } else if (it.type === "watch") {
-      openLaunch(d.title, "Resuming where you left off\u2026", d.c1, { icon: "play" }, null);
-    } else if (it.type === "sys") {
-      if (d.kind === "wall") { openPanel("wall"); }
-      else if (d.kind === "apps") { openPanel("apps"); }
-      else if (d.kind === "fx") { toggleFx(); }
-      else { openLaunch(d.name, d.sub, d.c, { icon: d.icon }, null); }
-    }
+    renderAppsRow();
   }
 
-  /* =====================================================================
-     Settings panels (virtual focus model so it works with any remote)
-     ===================================================================== */
-  var panelLayer = $("panelLayer"), panelEl = $("panel");
-  var P = { open: false, kind: "", rows: [], r: 0, c: 0, editing: null, scrollEl: null, scrollY: 0, strip: null, stripOff: 0 };
-
-  function pfAt(r, c) { return P.rows[r] ? P.rows[r][c] : null; }
-  function addPF(rowIdx, el, f) {
-    if (!P.rows[rowIdx]) { P.rows[rowIdx] = []; }
-    f.el = el;
-    P.rows[rowIdx].push(f);
-    var c = P.rows[rowIdx].length - 1;
-    el.onclick = function () { setPF(rowIdx, c); if (f.act) { f.act(); } };
-  }
-  function setPF(r, c) {
-    var old = pfAt(P.r, P.c);
-    if (old) { remC(old.el, "focused"); }
-    if (r >= P.rows.length) { r = P.rows.length - 1; }
-    if (r < 0) { r = 0; }
-    if (c >= P.rows[r].length) { c = P.rows[r].length - 1; }
-    if (c < 0) { c = 0; }
-    P.r = r; P.c = c;
-    var f = P.rows[r][c];
-    addC(f.el, "focused");
-    if (f.onfocus) { f.onfocus(); }
-  }
-  function mkField(value, ph, w) {
-    var wrap = mk("div", "pf field"), inp = document.createElement("input");
-    inp.type = "text"; inp.value = value; inp.placeholder = ph;
-    inp.setAttribute("autocomplete", "off"); inp.setAttribute("autocapitalize", "off"); inp.setAttribute("spellcheck", "false");
-    wrap.style.width = w + "px";
-    wrap.appendChild(inp);
-    inp.onfocus = function () { P.editing = inp; addC(wrap, "editing"); };
-    inp.onblur = function () { if (P.editing === inp) { P.editing = null; } remC(wrap, "editing"); };
-    return { wrap: wrap, input: inp };
-  }
-  function mkIcon(name) { return mk("div", "pf ibtn", svg(name)); }
-  function mkBtn(label) { return mk("div", "pf btnp", label); }
-
-  function scrollStrip(el) {
-    var off = P.stripOff || 0, left = el.offsetLeft, right = left + el.offsetWidth;
-    if (right - off > 1704) { off = right - 1704; }
-    if (left - off < 56) { off = left - 56; }
-    if (off < 0) { off = 0; }
-    P.stripOff = off;
-    setT(P.strip, "translateX(" + (-off) + "px)");
-  }
-  function ensureRowVisible(rowEl) {
-    var top = rowEl.offsetTop, h = rowEl.offsetHeight + 20, vh = 640, y = P.scrollY || 0;
-    if (top < y) { y = top; }
-    if (top + h > y + vh) { y = top + h - vh; }
-    if (y < 0) { y = 0; }
-    P.scrollY = y;
-    setT(P.scrollEl, "translateY(" + (-y) + "px)");
-  }
-  function refreshTicks() {
-    if (!P.open || P.kind !== "wall" || !P.rows[0]) { return; }
-    var i, f;
-    for (i = 0; i < P.rows[0].length; i++) {
-      f = P.rows[0][i];
-      f.tick.style.display = (f.wid === wallId) ? "block" : "none";
-    }
-  }
-  function nameFromUrl(u) {
-    var s = String(u).split("?")[0].split("#")[0], parts = s.split("/"), n = parts[parts.length - 1] || parts[parts.length - 2] || "Custom";
-    n = n.replace(/\.[a-z0-9]{2,5}$/i, "");
-    return n.length > 22 ? n.substr(0, 22) : (n || "Custom");
-  }
-  function addCustomWall(name, url) {
-    var id = "c" + (new Date().getTime());
-    customWalls.push({ id: id, name: name, url: url, base: "#05060a" });
-    return id;
+  function saveAppsState() {
+    try {
+      localStorage.setItem("aurora_user_apps", JSON.stringify(userApps));
+    } catch (e) {}
+    renderAppsRow();
+    updateNavigationTargets();
   }
 
-  /* ----- Wallpaper panel ----- */
-  function buildWallPanel() {
-    panelEl.appendChild(mk("div", "pTitle", "Wallpaper"));
-    panelEl.appendChild(mk("div", "pSub", "Pick a background, or add your own from an image link or file."));
+  /* ---------- Render Rows ---------- */
+  function renderAppsRow() {
+    appsTrack.innerHTML = "";
+    rowItems[1] = [];
 
-    var strip = mk("div", "strip"), inn = mk("div", "stripIn");
-    strip.appendChild(inn); panelEl.appendChild(strip);
-    P.strip = inn; P.stripOff = 0;
+    for (var i = 0; i < userApps.length; i++) {
+      var app = userApps[i];
+      var card = document.createElement("div");
+      card.className = "cardItem appCard";
+      card.setAttribute("data-row", "1");
+      card.setAttribute("data-col", "" + i);
 
-    var list = allWalls(), i;
-    for (i = 0; i < list.length; i++) {
-      (function (w) {
-        var el = mk("div", "thumb"), lab = mk("div", "tl"), tick = mk("div", "tick", svg("check"));
-        paintWall(el, w);
-        lab.textContent = w.name;
-        tick.firstChild.setAttribute("stroke", "#0a0d16");
-        el.appendChild(lab); el.appendChild(tick);
-        inn.appendChild(el);
-        addPF(0, el, {
-          wid: w.id, tick: tick,
-          act: function () { setWallpaper(w.id, false); },
-          onfocus: function () { scrollStrip(el); }
-        });
-      })(list[i]);
-    }
+      var face = document.createElement("div");
+      face.className = "cardFace";
+      setGradient(face, app.c1, app.c2);
 
-    // Row 1: image URL
-    var row1 = mk("div", "pRow"), uf = mkField("", "Image link, e.g. https://example.com/space.jpg", 1240);
-    row1.style.top = "396px";
-    row1.appendChild(uf.wrap);
-    var addBtn = mkBtn("Add link"); addBtn.style.marginLeft = "18px";
-    row1.appendChild(addBtn);
-    panelEl.appendChild(row1);
-    addPF(1, uf.wrap, { act: function () { uf.input.focus(); } });
-    addPF(1, addBtn, { act: function () {
-      var v = uf.input.value.replace(/^\s+|\s+$/g, "");
-      if (!v) { toast("Type an image link first"); return; }
-      if (customWalls.length >= MAX_CUSTOM_WALLS) { toast("Limit reached - delete a custom wallpaper first"); return; }
-      preload(v, function () {
-        var id = addCustomWall(nameFromUrl(v), v);
-        saveWalls();
-        wallId = null; setWallpaper(id, false);
-        renderPanel(0, allWalls().length - 1);
-      }, function () { toast("Couldn't load that image"); });
-    } });
+      var iconWrap = document.createElement("div");
+      iconWrap.className = "appIconWrap";
+      iconWrap.style.background = "rgba(0,0,0,0.25)";
+      iconWrap.innerHTML = getSvg(app.icon);
 
-    // Row 2: actions
-    var row2 = mk("div", "pRow");
-    row2.style.top = "496px";
-    var fileBtn = mkBtn("Choose file\u2026"), delBtn = mkBtn("Delete current"), closeBtn = mkBtn("Done");
-    row2.appendChild(fileBtn); row2.appendChild(delBtn); row2.appendChild(closeBtn);
-    panelEl.appendChild(row2);
+      var nameEl = document.createElement("div");
+      nameEl.className = "appName";
+      nameEl.innerHTML = app.name;
 
-    var fi = document.createElement("input");
-    fi.type = "file"; fi.setAttribute("accept", "image/*"); fi.style.display = "none";
-    panelEl.appendChild(fi);
-    fi.onchange = function () {
-      var f = fi.files && fi.files[0];
-      if (!f) { return; }
-      if (customWalls.length >= MAX_CUSTOM_WALLS) { toast("Limit reached - delete a custom wallpaper first"); return; }
-      try {
-        var rd = new FileReader();
-        rd.onload = function () {
-          var raw = rd.result, im = new Image();
-          im.onload = function () {
-            var out = raw;
-            try {
-              var s = Math.min(1, 1920 / im.width, 1080 / im.height), cv = document.createElement("canvas");
-              cv.width = Math.max(1, Math.round(im.width * s)); cv.height = Math.max(1, Math.round(im.height * s));
-              cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height);
-              out = cv.toDataURL("image/jpeg", 0.82);
-            } catch (e1) { out = raw; }
-            var id = addCustomWall(nameFromUrl(f.name), out);
-            if (!saveWalls()) { toast("Added for this session only (too large to save)"); }
-            wallId = null; setWallpaper(id, false);
-            renderPanel(0, allWalls().length - 1);
-          };
-          im.onerror = function () { toast("Couldn't read that image"); };
-          im.src = raw;
+      var ring = document.createElement("div");
+      ring.className = "focusRing";
+
+      card.appendChild(face);
+      card.appendChild(iconWrap);
+      card.appendChild(nameEl);
+      card.appendChild(ring);
+
+      (function (appObj, index) {
+        card.onclick = function () {
+          setFocus(1, index);
+          activateCurrentItem();
         };
-        rd.onerror = function () { toast("Couldn't read that file"); };
-        rd.readAsDataURL(f);
-      } catch (e2) { toast("File selection isn't supported here"); }
+      })(app, i);
+
+      appsTrack.appendChild(card);
+      rowItems[1].push({
+        el: card,
+        type: "app",
+        data: app,
+        color: app.c1
+      });
+    }
+
+    // Special Add App card at the end of the row
+    var addCard = document.createElement("div");
+    addCard.className = "cardItem appCard addAppCard";
+    addCard.setAttribute("data-row", "1");
+    addCard.setAttribute("data-col", "" + userApps.length);
+
+    var addIconWrap = document.createElement("div");
+    addIconWrap.className = "appIconWrap";
+    addIconWrap.style.background = "rgba(255,255,255,0.12)";
+    addIconWrap.innerHTML = getSvg("plus");
+
+    var addName = document.createElement("div");
+    addName.className = "appName";
+    addName.innerHTML = "+ Add App";
+
+    var addRing = document.createElement("div");
+    addRing.className = "focusRing";
+
+    addCard.appendChild(addIconWrap);
+    addCard.appendChild(addName);
+    addCard.appendChild(addRing);
+
+    addCard.onclick = function () {
+      setFocus(1, userApps.length);
+      openAppEditorModal();
     };
-    addPF(2, fileBtn, { act: function () { try { fi.click(); } catch (e) { toast("File picker isn't available - use an image link"); } } });
-    addPF(2, delBtn, { act: function () {
-      var k, w = findWall(wallId);
-      if (!w || !w.url) { toast("Only your own wallpapers can be deleted"); return; }
-      for (k = 0; k < customWalls.length; k++) { if (customWalls[k].id === wallId) { customWalls.splice(k, 1); break; } }
-      saveWalls();
-      wallId = null; setWallpaper("d0", true);
-      toast("Wallpaper deleted");
-      renderPanel(0, 0);
-    } });
-    addPF(2, closeBtn, { act: closePanel });
 
-    var note = mk("div", "pNote", "Tip: BLUE on the remote cycles wallpapers. TV browsers often can't open a file picker - an image link, or a path next to this page such as wallpapers/mine.jpg, always works.");
-    note.style.top = "586px";
-    panelEl.appendChild(note);
+    appsTrack.appendChild(addCard);
+    rowItems[1].push({
+      el: addCard,
+      type: "addApp",
+      data: null,
+      color: "#6b52ff"
+    });
   }
 
-  /* ----- App editor panel ----- */
-  function addAppRow(scr, i) {
-    var a = apps[i], row = mk("div", "arow"), nf = mkField(a.name, "Name", 400), uf = mkField(a.url, "https://\u2026", 640);
-    nf.input.oninput = function () { a.name = nf.input.value; };
-    uf.input.oninput = function () { a.url = uf.input.value; };
-    var up = mkIcon("up"), dn = mkIcon("down"), dl = mkIcon("x");
-    row.appendChild(nf.wrap); row.appendChild(uf.wrap); row.appendChild(up); row.appendChild(dn); row.appendChild(dl);
-    scr.appendChild(row);
-    var show = function () { ensureRowVisible(row); };
-    addPF(i, nf.wrap, { act: function () { nf.input.focus(); }, onfocus: show });
-    addPF(i, uf.wrap, { act: function () { uf.input.focus(); }, onfocus: show });
-    addPF(i, up, { onfocus: show, act: function () {
-      if (i > 0) { var t = apps[i - 1]; apps[i - 1] = apps[i]; apps[i] = t; renderPanel(i - 1, 2); }
-    } });
-    addPF(i, dn, { onfocus: show, act: function () {
-      if (i < apps.length - 1) { var t = apps[i + 1]; apps[i + 1] = apps[i]; apps[i] = t; renderPanel(i + 1, 3); }
-    } });
-    addPF(i, dl, { onfocus: show, act: function () {
-      if (apps.length <= 1) { toast("Keep at least one app"); return; }
-      apps.splice(i, 1);
-      renderPanel(Math.min(i, apps.length - 1), 0);
-    } });
-  }
-  function buildAppsPanel() {
-    panelEl.appendChild(mk("div", "pTitle", "Edit apps"));
-    panelEl.appendChild(mk("div", "pSub", "Rename shortcuts and set their links. Highlight a field and press OK to type."));
-    var body = mk("div", "pBody"), scr = mk("div", "pScroll"), i;
-    body.appendChild(scr); panelEl.appendChild(body);
-    P.scrollEl = scr; P.scrollY = 0;
-    for (i = 0; i < apps.length; i++) { addAppRow(scr, i); }
+  function renderWatchRow() {
+    watchTrack.innerHTML = "";
+    rowItems[2] = [];
 
-    var foot = mk("div", "pFoot"), n = apps.length;
-    var b1 = mkBtn("+ Add app"), b2 = mkBtn("Restore defaults"), b3 = mkBtn("Done");
-    foot.appendChild(b1); foot.appendChild(b2); foot.appendChild(b3);
-    panelEl.appendChild(foot);
-    addPF(n, b1, { act: function () {
-      if (apps.length >= MAX_APPS) { toast("Maximum of " + MAX_APPS + " apps"); return; }
-      apps.push({ name: "New app", url: "https://", c: PALETTE[apps.length % PALETTE.length] });
-      renderPanel(apps.length - 1, 0);
-    } });
-    addPF(n, b2, { act: function () { apps = cloneApps(); renderPanel(0, 0); toast("Default apps restored"); } });
-    addPF(n, b3, { act: closePanel });
-  }
+    for (var i = 0; i < WATCH_ITEMS.length; i++) {
+      var item = WATCH_ITEMS[i];
+      var card = document.createElement("div");
+      card.className = "cardItem watchCard";
+      card.setAttribute("data-row", "2");
+      card.setAttribute("data-col", "" + i);
 
-  function renderPanel(r, c) {
-    P.rows = []; P.editing = null; P.scrollY = 0;
-    panelEl.innerHTML = "";
-    if (P.kind === "wall") { buildWallPanel(); } else { buildAppsPanel(); }
-    setPF(r, c);
-    refreshTicks();
-  }
-  function openPanel(kind) {
-    var i, l, start = 0;
-    P.kind = kind; P.open = true; P.r = 0; P.c = 0;
-    panelEl.className = "glass " + (kind === "wall" ? "p-wall" : "p-apps");
-    panelLayer.className = "show";
-    if (kind === "wall") {
-      l = allWalls();
-      for (i = 0; i < l.length; i++) { if (l[i].id === wallId) { start = i; } }
+      var face = document.createElement("div");
+      face.className = "cardFace watchThumb";
+      setGradient(face, item.c1, item.c2);
+
+      var shade = document.createElement("div");
+      shade.className = "watchShade";
+
+      var playIcon = document.createElement("div");
+      playIcon.className = "watchPlayIcon";
+      playIcon.innerHTML = getSvg("play");
+
+      var title = document.createElement("div");
+      title.className = "watchTitle";
+      title.innerHTML = item.title;
+
+      var sub = document.createElement("div");
+      sub.className = "watchSub";
+      sub.innerHTML = item.sub;
+
+      var pBar = document.createElement("div");
+      pBar.className = "watchProgressBar";
+      var pFill = document.createElement("div");
+      pFill.className = "watchProgressFill";
+      pFill.style.width = item.pct + "%";
+      pBar.appendChild(pFill);
+
+      var ring = document.createElement("div");
+      ring.className = "focusRing";
+
+      card.appendChild(face);
+      card.appendChild(shade);
+      card.appendChild(playIcon);
+      card.appendChild(title);
+      card.appendChild(sub);
+      card.appendChild(pBar);
+      card.appendChild(ring);
+
+      (function (itemObj, index) {
+        card.onclick = function () {
+          setFocus(2, index);
+          activateCurrentItem();
+        };
+      })(item, i);
+
+      watchTrack.appendChild(card);
+      rowItems[2].push({
+        el: card,
+        type: "watch",
+        data: item,
+        color: item.c1
+      });
     }
-    renderPanel(0, start);
-  }
-  function commitApps() {
-    var i, a, clean = [];
-    for (i = 0; i < apps.length; i++) {
-      a = apps[i];
-      a.name = (a.name || "").replace(/^\s+|\s+$/g, "") || "App";
-      a.url = normUrl(a.url) || a.url;
-      clean.push(a);
-    }
-    apps = clean;
-    save("apps", apps);
-    buildApps();
-    if (cur.r === 1 && cur.i >= apps.length) { cur.i = apps.length - 1; }
-    setFocus(cur.r, Math.min(cur.i, rows[cur.r].items.length - 1));
-  }
-  function closePanel() {
-    if (P.editing) { P.editing.blur(); }
-    if (P.kind === "apps") { commitApps(); }
-    P.open = false;
-    panelLayer.className = "";
-  }
-  function panelKey(k) {
-    var f = pfAt(P.r, P.c);
-    if (P.editing) {
-      if (k === 13) { P.editing.blur(); return true; }
-      if (k === 10009 || k === 27) { P.editing.blur(); return true; }
-      if (k === 38 || k === 40) { P.editing.blur(); }
-      else { return false; }          // let the browser type / move the caret
-    }
-    if (k === 37) { if (P.c > 0) { setPF(P.r, P.c - 1); } return true; }
-    if (k === 39) { setPF(P.r, P.c + 1); return true; }
-    if (k === 38) { if (P.r > 0) { setPF(P.r - 1, P.c); } return true; }
-    if (k === 40) { setPF(P.r + 1, P.c); return true; }
-    if (k === 13) { if (f && f.act) { f.act(); } return true; }
-    if (k === 8 || k === 27 || k === 10009) { closePanel(); return true; }
-    return false;
   }
 
-  /* =====================================================================
-     Keys (arrows, Enter, Back, colour buttons)
-     ===================================================================== */
+  function renderSettingsRow() {
+    settingsTrack.innerHTML = "";
+    rowItems[3] = [];
+
+    for (var i = 0; i < SYSTEM_ITEMS.length; i++) {
+      var item = SYSTEM_ITEMS[i];
+      var card = document.createElement("div");
+      card.className = "cardItem sysCard";
+      card.setAttribute("data-row", "3");
+      card.setAttribute("data-col", "" + i);
+
+      var face = document.createElement("div");
+      face.className = "cardFace";
+      face.style.background = "rgba(255,255,255,0.06)";
+
+      var iconWrap = document.createElement("div");
+      iconWrap.className = "sysIconWrap";
+      setGradient(iconWrap, item.c1, item.c2);
+      iconWrap.innerHTML = getSvg(item.icon);
+
+      var labelWrap = document.createElement("div");
+      labelWrap.className = "sysLabelWrap";
+
+      var title = document.createElement("div");
+      title.className = "sysTitle";
+      title.innerHTML = item.name;
+
+      var sub = document.createElement("div");
+      sub.className = "sysSub";
+      sub.innerHTML = item.sub;
+
+      labelWrap.appendChild(title);
+      labelWrap.appendChild(sub);
+
+      var ring = document.createElement("div");
+      ring.className = "focusRing";
+
+      card.appendChild(face);
+      card.appendChild(iconWrap);
+      card.appendChild(labelWrap);
+      card.appendChild(ring);
+
+      (function (itemObj, index) {
+        card.onclick = function () {
+          setFocus(3, index);
+          activateCurrentItem();
+        };
+      })(item, i);
+
+      settingsTrack.appendChild(card);
+      rowItems[3].push({
+        el: card,
+        type: "system",
+        data: item,
+        color: item.c1
+      });
+    }
+  }
+
+  function setupHeroRow() {
+    rowItems[0] = [];
+    var btnPlay = $("btnPlayHero");
+    var btnList = $("btnListHero");
+
+    var ringPlay = document.createElement("div");
+    ringPlay.className = "focusRing";
+    btnPlay.appendChild(ringPlay);
+
+    var ringList = document.createElement("div");
+    ringList.className = "focusRing";
+    btnList.appendChild(ringList);
+
+    btnPlay.onclick = function () {
+      setFocus(0, 0);
+      activateCurrentItem();
+    };
+    btnList.onclick = function () {
+      setFocus(0, 1);
+      activateCurrentItem();
+    };
+
+    rowItems[0].push({ el: btnPlay, type: "heroPlay", data: null, color: "#ffffff" });
+    rowItems[0].push({ el: btnList, type: "heroList", data: null, color: "#ffffff" });
+
+    // Build Hero Dots
+    var dotsContainer = $("heroDots");
+    dotsContainer.innerHTML = "";
+    for (var i = 0; i < HERO_ITEMS.length; i++) {
+      var dot = document.createElement("span");
+      dot.className = "heroDot" + (i === 0 ? " active" : "");
+      dotsContainer.appendChild(dot);
+    }
+
+    renderHeroSlide(0);
+    startHeroRotation();
+  }
+
+  function renderHeroSlide(index) {
+    heroIndex = index;
+    var item = HERO_ITEMS[index];
+    $("heroBadge").innerHTML = item.badge;
+    $("heroTitle").innerHTML = item.title;
+    $("heroMeta").innerHTML = item.meta;
+    $("heroDesc").innerHTML = item.desc;
+    setGradient($("heroArtVisual"), item.c1, item.c2);
+
+    var dots = $("heroDots").getElementsByTagName("span");
+    for (var k = 0; k < dots.length; k++) {
+      dots[k].className = "heroDot" + (k === index ? " active" : "");
+    }
+
+    if (nav.row === 0) {
+      setAmbientGlow(item.c1);
+    }
+  }
+
+  function startHeroRotation() {
+    clearInterval(heroTimer);
+    heroTimer = setInterval(function () {
+      var next = (heroIndex + 1) % HERO_ITEMS.length;
+      $("heroTextPane").className = "fade";
+      $("heroArtPane").className = "fade";
+      setTimeout(function () {
+        renderHeroSlide(next);
+        $("heroTextPane").className = "";
+        $("heroArtPane").className = "";
+      }, 300);
+    }, 10000);
+  }
+
+  /* ---------- Navigation & Focus Engine ---------- */
+  function updateNavigationTargets() {
+    // Clamps column index if list changed
+    if (nav.col >= rowItems[nav.row].length) {
+      nav.col = Math.max(0, rowItems[nav.row].length - 1);
+    }
+  }
+
+  function setFocus(row, col) {
+    // Clear old focus
+    var oldRow = rowItems[nav.row];
+    if (oldRow && oldRow[nav.col]) {
+      oldRow[nav.col].el.className = oldRow[nav.col].el.className.replace(/\s*focused/g, "");
+    }
+
+    var allRows = $("rowsTrack").getElementsByClassName("tvRow");
+    for (var r = 0; r < allRows.length; r++) {
+      allRows[r].className = allRows[r].className.replace(/\s*active/g, "");
+    }
+
+    nav.row = Math.max(0, Math.min(row, 3));
+    var targetList = rowItems[nav.row];
+    nav.col = Math.max(0, Math.min(col, targetList.length - 1));
+
+    var currentTarget = targetList[nav.col];
+    if (currentTarget) {
+      currentTarget.el.className += " focused";
+      if (nav.row !== 0) {
+        allRows[nav.row].className += " active";
+      }
+      setAmbientGlow(currentTarget.color || HERO_ITEMS[heroIndex].c1);
+    }
+
+    // Scroll vertical row into view
+    var rowY = 0;
+    if (nav.row === 1) { rowY = 320; }
+    else if (nav.row === 2) { rowY = 560; }
+    else if (nav.row === 3) { rowY = 820; }
+    setElementTransform(rowsTrack, "translateY(" + (-rowY) + "px)");
+
+    // Scroll horizontal track into view
+    scrollTrackIntoView(nav.row, nav.col);
+  }
+
+  function scrollTrackIntoView(row, col) {
+    if (row === 0) { return; }
+    var track = (row === 1) ? appsTrack : (row === 2) ? watchTrack : settingsTrack;
+    var item = rowItems[row][col].el;
+    var trackOffset = track.offsetLeftDelta || 0;
+    var itemLeft = item.offsetLeft;
+    var itemRight = itemLeft + item.offsetWidth;
+
+    if (itemRight - trackOffset > 1800) {
+      trackOffset = itemRight - 1800;
+    }
+    if (itemLeft - trackOffset < 80) {
+      trackOffset = itemLeft - 80;
+    }
+    if (trackOffset < 0) { trackOffset = 0; }
+    track.offsetLeftDelta = trackOffset;
+    setElementTransform(track, "translateX(" + (-trackOffset) + "px)");
+  }
+
+  /* ---------- Action Activation ---------- */
+  function activateCurrentItem() {
+    var cur = rowItems[nav.row][nav.col];
+    if (!cur) { return; }
+
+    if (cur.type === "heroPlay") {
+      openLaunchOverlay({
+        name: HERO_ITEMS[heroIndex].title,
+        url: "",
+        icon: "play",
+        c1: HERO_ITEMS[heroIndex].c1,
+        c2: HERO_ITEMS[heroIndex].c2,
+        sub: "Starting featured playback..."
+      });
+    } else if (cur.type === "heroList") {
+      showToast("Added \"" + HERO_ITEMS[heroIndex].title + "\" to My List");
+    } else if (cur.type === "app") {
+      openLaunchOverlay(cur.data);
+    } else if (cur.type === "addApp") {
+      openAppEditorModal();
+    } else if (cur.type === "watch") {
+      openLaunchOverlay({
+        name: cur.data.title,
+        url: "",
+        icon: "play",
+        c1: cur.data.c1,
+        c2: cur.data.c2,
+        sub: "Resuming playback..."
+      });
+    } else if (cur.type === "system") {
+      handleSystemAction(cur.data.id);
+    }
+  }
+
+  function handleSystemAction(id) {
+    if (id === "wallpaper") {
+      openWallpaperModal();
+    } else if (id === "editapps") {
+      openAppEditorModal();
+    } else if (id === "effects") {
+      setEffectsState(!effectsEnabled);
+      showToast("Effects: " + (effectsEnabled ? "Enabled" : "Disabled"));
+    } else if (id === "hdmi1" || id === "hdmi2") {
+      showToast("Switching to " + (id === "hdmi1" ? "HDMI 1" : "HDMI 2") + "...");
+    } else if (id === "mirror") {
+      showToast("Screen Mirroring ready for wireless devices");
+    } else if (id === "picture") {
+      showToast("Picture Mode: Cinema Optimized (1080p)");
+    } else if (id === "sound") {
+      showToast("Sound Profile: DTS Studio Surround");
+    }
+  }
+
+  /* ---------- App Launch Overlay ---------- */
+  var launchCountdownTimer = null;
+  var launchTargetApp = null;
+
+  function openLaunchOverlay(app) {
+    launchTargetApp = app;
+    nav.modal = "launch";
+
+    $("launchName").innerHTML = app.name;
+    $("launchSub").innerHTML = app.sub || "Connecting to " + (app.url || app.name) + "...";
+    setGradient($("launchIcon"), app.c1 || "#6b52ff", app.c2 || "#1a237e");
+    $("launchIcon").innerHTML = getSvg(app.icon || "play");
+
+    $("launchOverlay").className = "active";
+    $("btnLaunchNow").className = "actionBtn actionBtnPrimary focused";
+    $("btnLaunchCancel").className = "actionBtn actionBtnSecondary";
+
+    // Auto-launch timer
+    clearTimeout(launchCountdownTimer);
+    launchCountdownTimer = setTimeout(function () {
+      executeLaunch();
+    }, 2500);
+  }
+
+  function executeLaunch() {
+    clearTimeout(launchCountdownTimer);
+    if (launchTargetApp && launchTargetApp.url && launchTargetApp.url.indexOf("http") === 0) {
+      showToast("Opening " + launchTargetApp.name + "...");
+      setTimeout(function () {
+        window.location.href = launchTargetApp.url;
+      }, 500);
+    } else {
+      showToast("Launching " + (launchTargetApp ? launchTargetApp.name : "App"));
+      closeLaunchOverlay();
+    }
+  }
+
+  function closeLaunchOverlay() {
+    clearTimeout(launchCountdownTimer);
+    $("launchOverlay").className = "";
+    nav.modal = null;
+  }
+
+  $("btnLaunchNow").onclick = executeLaunch;
+  $("btnLaunchCancel").onclick = closeLaunchOverlay;
+
+  /* ---------- Wallpaper Modal Engine ---------- */
+  function openWallpaperModal() {
+    nav.modal = "wallpaper";
+    nav.modalIndex = 0;
+    renderWallpaperGrid();
+    $("wallpaperModal").className = "modalOverlay active";
+  }
+
+  function closeWallpaperModal() {
+    $("wallpaperModal").className = "modalOverlay";
+    nav.modal = null;
+  }
+
+  function renderWallpaperGrid() {
+    var grid = $("wallpaperGrid");
+    grid.innerHTML = "";
+    var all = getAllWallpapers();
+
+    for (var i = 0; i < all.length; i++) {
+      var wp = all[i];
+      var card = document.createElement("div");
+      card.className = "wpThumbCard" + (wp.id === currentWallpaperId ? " selected" : "");
+      card.setAttribute("data-index", "" + i);
+
+      if (wp.type === "image") {
+        card.style.background = "url('" + wp.url + "') center center / cover no-repeat";
+      } else {
+        card.style.background = wp.css;
+      }
+
+      var nameBadge = document.createElement("div");
+      nameBadge.className = "wpNameBadge";
+      nameBadge.innerHTML = wp.name;
+      card.appendChild(nameBadge);
+
+      // Delete custom wallpaper button
+      if (wp.custom) {
+        var delBtn = document.createElement("div");
+        delBtn.className = "wpDeleteBtn";
+        delBtn.innerHTML = "&times;";
+        delBtn.title = "Delete wallpaper";
+        (function (customId) {
+          delBtn.onclick = function (e) {
+            if (e && e.stopPropagation) { e.stopPropagation(); }
+            deleteCustomWallpaper(customId);
+          };
+        })(wp.id);
+        card.appendChild(delBtn);
+      }
+
+      (function (wpItem, idx) {
+        card.onclick = function () {
+          applyWallpaper(wpItem.id);
+          renderWallpaperGrid();
+          showToast("Wallpaper applied: " + wpItem.name);
+        };
+      })(wp, i);
+
+      grid.appendChild(card);
+    }
+
+    highlightWallpaperModalFocus();
+  }
+
+  function highlightWallpaperModalFocus() {
+    var cards = $("wallpaperGrid").getElementsByClassName("wpThumbCard");
+    for (var i = 0; i < cards.length; i++) {
+      if (i === nav.modalIndex) {
+        cards[i].className += " focused";
+      } else {
+        cards[i].className = cards[i].className.replace(/\s*focused/g, "");
+      }
+    }
+  }
+
+  function deleteCustomWallpaper(id) {
+    var filtered = [];
+    for (var i = 0; i < userWallpapers.length; i++) {
+      if (userWallpapers[i].id !== id) {
+        filtered.push(userWallpapers[i]);
+      }
+    }
+    userWallpapers = filtered;
+    try {
+      localStorage.setItem("aurora_custom_wallpapers", JSON.stringify(userWallpapers));
+    } catch (e) {}
+
+    if (currentWallpaperId === id) {
+      applyWallpaper(DEFAULT_WALLPAPERS[0].id);
+    }
+    renderWallpaperGrid();
+    showToast("Custom wallpaper removed");
+  }
+
+  $("btnAddCustomWp").onclick = function () {
+    var url = $("customWpInput").value.trim();
+    var name = $("customWpNameInput").value.trim() || "Custom Image";
+    if (!url) {
+      showToast("Please enter a valid image URL");
+      return;
+    }
+    var newWp = {
+      id: "custom_" + new Date().getTime(),
+      name: name,
+      type: "image",
+      url: url,
+      c1: "#6b52ff",
+      c2: "#1a237e",
+      custom: true
+    };
+    userWallpapers.push(newWp);
+    try {
+      localStorage.setItem("aurora_custom_wallpapers", JSON.stringify(userWallpapers));
+    } catch (e) {}
+    $("customWpInput").value = "";
+    $("customWpNameInput").value = "";
+    applyWallpaper(newWp.id);
+    renderWallpaperGrid();
+    showToast("Added custom wallpaper: " + name);
+  };
+
+  $("btnCloseWpModal").onclick = closeWallpaperModal;
+
+  /* ---------- App Editor Modal Engine ---------- */
+  var editingAppId = null;
+  var selectedColorPreset = COLOR_PRESETS[0];
+
+  function openAppEditorModal() {
+    nav.modal = "appEditor";
+    nav.modalIndex = 0;
+    editingAppId = null;
+    resetAppEditorForm();
+    renderAppEditorList();
+    renderEditorColorRow();
+    highlightAppEditorFocus();
+    $("appEditorModal").className = "modalOverlay active";
+  }
+
+  function closeAppEditorModal() {
+    $("appEditorModal").className = "modalOverlay";
+    nav.modal = null;
+  }
+
+  function renderEditorColorRow() {
+    var row = $("editorColorRow");
+    row.innerHTML = "";
+    for (var i = 0; i < COLOR_PRESETS.length; i++) {
+      var opt = document.createElement("div");
+      opt.className = "colorOption" + (COLOR_PRESETS[i].c1 === selectedColorPreset.c1 ? " active" : "");
+      setGradient(opt, COLOR_PRESETS[i].c1, COLOR_PRESETS[i].c2);
+      (function (preset) {
+        opt.onclick = function () {
+          selectedColorPreset = preset;
+          renderEditorColorRow();
+        };
+      })(COLOR_PRESETS[i]);
+      row.appendChild(opt);
+    }
+  }
+
+  function renderAppEditorList() {
+    var list = $("appEditorList");
+    list.innerHTML = "";
+
+    for (var i = 0; i < userApps.length; i++) {
+      var app = userApps[i];
+      var row = document.createElement("div");
+      row.className = "appEditItem" + (app.id === editingAppId ? " selected" : "");
+      row.setAttribute("data-app-id", app.id);
+
+      var idxSpan = document.createElement("div");
+      idxSpan.className = "appEditIndex";
+      idxSpan.innerHTML = "" + (i + 1);
+
+      var icon = document.createElement("div");
+      icon.className = "appEditIcon";
+      setGradient(icon, app.c1, app.c2);
+      icon.innerHTML = getSvg(app.icon);
+
+      var details = document.createElement("div");
+      details.className = "appEditDetails";
+      var name = document.createElement("div");
+      name.className = "appEditName";
+      name.innerHTML = app.name;
+      var url = document.createElement("div");
+      url.className = "appEditUrl";
+      url.innerHTML = app.url || "No launch URL";
+      details.appendChild(name);
+      details.appendChild(url);
+
+      var controls = document.createElement("div");
+      controls.className = "appEditControls";
+
+      // Move Left
+      var btnLeft = document.createElement("button");
+      btnLeft.className = "miniBtn";
+      btnLeft.innerHTML = "&#9664;";
+      btnLeft.title = "Move Left";
+      (function (index) {
+        btnLeft.onclick = function (e) {
+          if (e && e.stopPropagation) { e.stopPropagation(); }
+          moveApp(index, -1);
+        };
+      })(i);
+
+      // Move Right
+      var btnRight = document.createElement("button");
+      btnRight.className = "miniBtn";
+      btnRight.innerHTML = "&#9654;";
+      btnRight.title = "Move Right";
+      (function (index) {
+        btnRight.onclick = function (e) {
+          if (e && e.stopPropagation) { e.stopPropagation(); }
+          moveApp(index, 1);
+        };
+      })(i);
+
+      // Delete
+      var btnDelete = document.createElement("button");
+      btnDelete.className = "miniBtn miniBtnDanger";
+      btnDelete.innerHTML = "&times;";
+      btnDelete.title = "Delete";
+      (function (index) {
+        btnDelete.onclick = function (e) {
+          if (e && e.stopPropagation) { e.stopPropagation(); }
+          deleteApp(index);
+        };
+      })(i);
+
+      controls.appendChild(btnLeft);
+      controls.appendChild(btnRight);
+      controls.appendChild(btnDelete);
+
+      row.appendChild(idxSpan);
+      row.appendChild(icon);
+      row.appendChild(details);
+      row.appendChild(controls);
+
+      (function (appObj) {
+        row.onclick = function () {
+          startEditApp(appObj);
+        };
+      })(app);
+
+      list.appendChild(row);
+    }
+  }
+
+  function highlightAppEditorFocus() {
+    var items = $("appEditorList").getElementsByClassName("appEditItem");
+    for (var i = 0; i < items.length; i++) {
+      if (i === nav.modalIndex) {
+        items[i].className += " focused";
+        var parent = $("appEditorList");
+        var top = items[i].offsetTop - 20;
+        if (top < 0) { top = 0; }
+        parent.scrollTop = top;
+      } else {
+        items[i].className = items[i].className.replace(/\s*focused/g, "");
+      }
+    }
+  }
+
+  function moveApp(index, delta) {
+    var newIdx = index + delta;
+    if (newIdx < 0 || newIdx >= userApps.length) { return; }
+    var temp = userApps[index];
+    userApps[index] = userApps[newIdx];
+    userApps[newIdx] = temp;
+    nav.modalIndex = newIdx;
+    saveAppsState();
+    renderAppEditorList();
+    highlightAppEditorFocus();
+  }
+
+  function deleteApp(index) {
+    if (userApps.length <= 1) {
+      showToast("Cannot remove all apps");
+      return;
+    }
+    var removed = userApps.splice(index, 1);
+    if (nav.modalIndex >= userApps.length) {
+      nav.modalIndex = Math.max(0, userApps.length - 1);
+    }
+    saveAppsState();
+    if (editingAppId === removed[0].id) {
+      resetAppEditorForm();
+    }
+    renderAppEditorList();
+    highlightAppEditorFocus();
+    showToast("Removed " + removed[0].name);
+  }
+
+  function startEditApp(app) {
+    editingAppId = app.id;
+    $("editorFormTitle").innerHTML = "Edit Application: " + app.name;
+    $("appFormName").value = app.name;
+    $("appFormUrl").value = app.url || "";
+    selectedColorPreset = { c1: app.c1, c2: app.c2 };
+    $("btnSaveAppForm").innerHTML = "Update Application";
+    $("btnCancelEditApp").style.display = "block";
+    renderEditorColorRow();
+    renderAppEditorList();
+  }
+
+  function resetAppEditorForm() {
+    editingAppId = null;
+    $("editorFormTitle").innerHTML = "Add New Application";
+    $("appFormName").value = "";
+    $("appFormUrl").value = "";
+    selectedColorPreset = COLOR_PRESETS[0];
+    $("btnSaveAppForm").innerHTML = "Save Application";
+    $("btnCancelEditApp").style.display = "none";
+    renderEditorColorRow();
+  }
+
+  $("btnSaveAppForm").onclick = function () {
+    var name = $("appFormName").value.trim();
+    var url = $("appFormUrl").value.trim();
+    if (!name) {
+      showToast("Please enter an app name");
+      return;
+    }
+
+    if (editingAppId) {
+      // Update existing
+      for (var i = 0; i < userApps.length; i++) {
+        if (userApps[i].id === editingAppId) {
+          userApps[i].name = name;
+          userApps[i].url = url;
+          userApps[i].c1 = selectedColorPreset.c1;
+          userApps[i].c2 = selectedColorPreset.c2;
+          break;
+        }
+      }
+      showToast("Updated " + name);
+    } else {
+      // Create new
+      var newApp = {
+        id: "app_" + new Date().getTime(),
+        name: name,
+        url: url,
+        icon: "browser",
+        c1: selectedColorPreset.c1,
+        c2: selectedColorPreset.c2
+      };
+      userApps.push(newApp);
+      showToast("Added " + name);
+    }
+
+    saveAppsState();
+    resetAppEditorForm();
+    renderAppEditorList();
+  };
+
+  $("btnCancelEditApp").onclick = function () {
+    resetAppEditorForm();
+    renderAppEditorList();
+  };
+
+  $("btnRestoreDefaultApps").onclick = function () {
+    userApps = JSON.parse(JSON.stringify(DEFAULT_APPS));
+    saveAppsState();
+    resetAppEditorForm();
+    renderAppEditorList();
+    showToast("Restored default applications");
+  };
+
+  $("btnCloseAppModal").onclick = closeAppEditorModal;
+
+  /* ---------- Remote Control & Keyboard Handler ---------- */
   document.onkeydown = function (e) {
     e = e || window.event;
-    var k = e.keyCode, r = cur.r, i = cur.i, handled = true;
+    var code = e.keyCode || e.which;
+    var handled = true;
 
-    if (launching) {
-      if (k === 8 || k === 27 || k === 10009 || k === 13) { closeLaunch(); }
+    // Modal navigation trap
+    if (nav.modal) {
+      if (code === 8 || code === 27 || code === 10009) { // Back
+        if (nav.modal === "launch") { closeLaunchOverlay(); }
+        else if (nav.modal === "wallpaper") { closeWallpaperModal(); }
+        else if (nav.modal === "appEditor") { closeAppEditorModal(); }
+      } else if (code === 13) { // OK
+        if (nav.modal === "launch") { executeLaunch(); }
+        else if (nav.modal === "wallpaper") {
+          var allWp = getAllWallpapers();
+          if (allWp[nav.modalIndex]) {
+            applyWallpaper(allWp[nav.modalIndex].id);
+            renderWallpaperGrid();
+            showToast("Wallpaper applied: " + allWp[nav.modalIndex].name);
+          }
+        } else if (nav.modal === "appEditor") {
+          if (userApps[nav.modalIndex]) {
+            startEditApp(userApps[nav.modalIndex]);
+          }
+        }
+      } else if (code === 37) { // Left
+        if (nav.modal === "wallpaper" && nav.modalIndex > 0) {
+          nav.modalIndex--;
+          highlightWallpaperModalFocus();
+        } else if (nav.modal === "appEditor") {
+          moveApp(nav.modalIndex, -1);
+        }
+      } else if (code === 39) { // Right
+        if (nav.modal === "wallpaper") {
+          var totalWp = getAllWallpapers().length;
+          if (nav.modalIndex < totalWp - 1) {
+            nav.modalIndex++;
+            highlightWallpaperModalFocus();
+          }
+        } else if (nav.modal === "appEditor") {
+          moveApp(nav.modalIndex, 1);
+        }
+      } else if (code === 38) { // Up
+        if (nav.modal === "wallpaper" && nav.modalIndex >= 4) {
+          nav.modalIndex -= 4;
+          highlightWallpaperModalFocus();
+        } else if (nav.modal === "appEditor" && nav.modalIndex > 0) {
+          nav.modalIndex--;
+          highlightAppEditorFocus();
+        }
+      } else if (code === 40) { // Down
+        if (nav.modal === "wallpaper") {
+          var totalWpCount = getAllWallpapers().length;
+          if (nav.modalIndex + 4 < totalWpCount) {
+            nav.modalIndex += 4;
+            highlightWallpaperModalFocus();
+          }
+        } else if (nav.modal === "appEditor" && nav.modalIndex < userApps.length - 1) {
+          nav.modalIndex++;
+          highlightAppEditorFocus();
+        }
+      }
       if (e.preventDefault) { e.preventDefault(); }
       return false;
     }
-    if (P.open) {
-      handled = panelKey(k);
-      if (handled && e.preventDefault) { e.preventDefault(); }
-      return !handled;
+
+    // Samsung Remote Colour Keys & Desktop Keyboard Equivalents
+    // Red: 403 or 'r' (82)
+    // Green: 404 or 'g' (71)
+    // Yellow: 405 or 'y' (89)
+    // Blue: 406 or 'b' (66)
+    if (code === 403 || code === 82) {
+      openWallpaperModal();
+    } else if (code === 404 || code === 71) {
+      openAppEditorModal();
+    } else if (code === 405 || code === 89) {
+      setEffectsState(!effectsEnabled);
+      showToast("Effects: " + (effectsEnabled ? "Enabled" : "Disabled"));
+    } else if (code === 406 || code === 66) {
+      cycleNextWallpaper();
+    }
+    // Standard Remote Directional Pad
+    else if (code === 37) { // Left
+      if (nav.col > 0) {
+        setFocus(nav.row, nav.col - 1);
+      }
+    } else if (code === 39) { // Right
+      if (nav.col < rowItems[nav.row].length - 1) {
+        setFocus(nav.row, nav.col + 1);
+      }
+    } else if (code === 38) { // Up
+      if (nav.row > 0) {
+        setFocus(nav.row - 1, nav.col);
+      }
+    } else if (code === 40) { // Down
+      if (nav.row < 3) {
+        setFocus(nav.row + 1, nav.col);
+      }
+    } else if (code === 13) { // Enter / OK
+      activateCurrentItem();
+    } else if (code === 8 || code === 27 || code === 10009) { // Back
+      if (nav.row !== 0 || nav.col !== 0) {
+        setFocus(0, 0);
+      }
+    } else {
+      handled = false;
     }
 
-    if (k === 37) { if (i > 0) { setFocus(r, i - 1); } }
-    else if (k === 39) { if (i < rows[r].items.length - 1) { setFocus(r, i + 1); } }
-    else if (k === 38) { if (r > 0) { setFocus(r - 1, Math.min(rows[r - 1].idx, rows[r - 1].items.length - 1)); } }
-    else if (k === 40) { if (r < rows.length - 1) { setFocus(r + 1, Math.min(rows[r + 1].idx, rows[r + 1].items.length - 1)); } }
-    else if (k === 13) { activate(); }
-    else if (k === 8 || k === 27 || k === 10009) { if (r !== 0 || i !== 0) { setFocus(0, 0); } }
-    else if (k === 406 || k === 87) { nextWallpaper(); }          // BLUE / W
-    else if (k === 404 || k === 69) { openPanel("apps"); }        // GREEN / E
-    else if (k === 403 || k === 77) { openPanel("wall"); }        // RED / M
-    else if (k === 405 || k === 70) { toggleFx(); }               // YELLOW / F
-    else { handled = false; }
-
-    if (handled && e.preventDefault) { e.preventDefault(); }
+    if (handled && e.preventDefault) {
+      e.preventDefault();
+    }
     return !handled;
   };
-  launchEl.onclick = closeLaunch;
 
-  // Samsung Tizen: ask the TV to deliver the colour keys to this page
+  // Clickable shortcut pills in footer
+  $("btnShortcutRed").onclick = openWallpaperModal;
+  $("btnShortcutGreen").onclick = openAppEditorModal;
+  $("btnShortcutYellow").onclick = function () {
+    setEffectsState(!effectsEnabled);
+    showToast("Effects: " + (effectsEnabled ? "Enabled" : "Disabled"));
+  };
+  $("btnShortcutBlue").onclick = cycleNextWallpaper;
+
+  // Samsung Tizen TV Input Key Registration
   try {
     if (window.tizen && window.tizen.tvinputdevice) {
-      window.tizen.tvinputdevice.registerKeyBatch(["ColorF0Red", "ColorF1Green", "ColorF2Yellow", "ColorF3Blue"]);
+      var tizenKeys = ["MediaPlayPause", "ColorF0Red", "ColorF1Green", "ColorF2Yellow", "ColorF3Blue"];
+      for (var k = 0; k < tizenKeys.length; k++) {
+        try {
+          window.tizen.tvinputdevice.registerKey(tizenKeys[k]);
+        } catch (e) {}
+      }
     }
   } catch (err) {}
 
-  /* =====================================================================
-     Go
-     ===================================================================== */
-  setWallpaper(load("wall", "d0"), true);
-  paintHero(0);
-  setFocus(0, 0);
-  startHero();
-  setTimeout(function () { stage.className = "ready"; }, 50);
+  /* ---------- Startup Initialization ---------- */
+  function initialize() {
+    setupParticles();
+    loadAppsState();
+    renderWatchRow();
+    renderSettingsRow();
+    setupHeroRow();
+    loadWallpaperState();
+
+    try {
+      var savedEff = localStorage.getItem("aurora_effects_enabled");
+      if (savedEff === "0") {
+        setEffectsState(false);
+      }
+    } catch (e) {}
+
+    setFocus(0, 0);
+    setTimeout(function () {
+      stage.className = "ready";
+    }, 100);
+  }
+
+  initialize();
 })();
 </script>
 </body>
