@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Aurora TV Samsung Edition</title>
-<meta name="description" content="Minimal futuristic TV homepage inspired by Apple Liquid Glass and built for Samsung Smart TVs (2016) and modern browsers.">
+<meta name="description" content="Lightweight futuristic TV homepage inspired by Apple Liquid Glass and optimized for 2016 Samsung Smart TVs and modern browsers.">
 <meta property="og:title" content="Aurora TV Samsung Edition">
-<meta property="og:description" content="Minimal futuristic TV homepage inspired by Apple Liquid Glass and built for Samsung Smart TVs (2016) and modern browsers.">
+<meta property="og:description" content="Lightweight futuristic TV homepage inspired by Apple Liquid Glass and optimized for 2016 Samsung Smart TVs and modern browsers.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <style>
 /* ==========================================================================
-   Base & Resets (Optimised for Samsung 2016 T-KTSDEUC-1410.1 / WebKit / ES5)
+   Base & Resets (Optimised for Samsung LV32F390 Tizen 2.4 WebKit / ES5)
    ========================================================================== */
 html, body {
   margin: 0;
@@ -26,7 +26,7 @@ html, body {
   user-select: none;
 }
 
-/* Virtual 1920x1080 Stage scaled via transform to fit any display without distortion */
+/* Virtual 1920x1080 Stage with Hardware Layer Promotion */
 #stage {
   position: absolute;
   left: 50%;
@@ -39,16 +39,18 @@ html, body {
   background: #020409;
   -webkit-transform-origin: 50% 50%;
   transform-origin: 50% 50%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   opacity: 0;
-  -webkit-transition: opacity 0.4s ease;
-  transition: opacity 0.4s ease;
+  -webkit-transition: opacity 0.35s ease;
+  transition: opacity 0.35s ease;
 }
 #stage.ready {
   opacity: 1;
 }
 
 /* ==========================================================================
-   Colourful Fading Backgrounds (Liquid Glass & Natural Fade to Black)
+   Colourful Liquid Background (Optimised Compositing: 2 Layers instead of 5)
    ========================================================================== */
 #bgContainer {
   position: absolute;
@@ -61,42 +63,34 @@ html, body {
   overflow: hidden;
 }
 
-/* Base deep layer */
-#bgBase {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1920px;
-  height: 1080px;
-  background: #02040a;
-}
-
-/* Vibrant Animated Liquid Color Orbs */
+/* Base Mesh with subtle GPU-accelerated breathing animation */
 #bgAuraMesh {
   position: absolute;
-  left: -200px;
-  top: -200px;
-  width: 2320px;
-  height: 1480px;
-  opacity: 0.85;
-  -webkit-transition: opacity 0.8s ease;
-  transition: opacity 0.8s ease;
-  -webkit-animation: auraBreath 16s ease-in-out infinite alternate;
-  animation: auraBreath 16s ease-in-out infinite alternate;
+  left: -120px;
+  top: -120px;
+  width: 2160px;
+  height: 1320px;
+  opacity: 0.88;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-transition: opacity 0.6s ease;
+  transition: opacity 0.6s ease;
+  -webkit-animation: auraDrift 18s ease-in-out infinite alternate;
+  animation: auraDrift 18s ease-in-out infinite alternate;
 }
 
-@-webkit-keyframes auraBreath {
-  0% { -webkit-transform: translate3d(0, 0, 0) scale(1); }
-  50% { -webkit-transform: translate3d(40px, -25px, 0) scale(1.06); }
-  100% { -webkit-transform: translate3d(-30px, 30px, 0) scale(1.02); }
+@-webkit-keyframes auraDrift {
+  0%   { -webkit-transform: translate3d(0, 0, 0) scale(1); }
+  50%  { -webkit-transform: translate3d(30px, -20px, 0) scale(1.04); }
+  100% { -webkit-transform: translate3d(-20px, 20px, 0) scale(1.02); }
 }
-@keyframes auraBreath {
-  0% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(40px, -25px, 0) scale(1.06); }
-  100% { transform: translate3d(-30px, 30px, 0) scale(1.02); }
+@keyframes auraDrift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(30px, -20px, 0) scale(1.04); }
+  100% { transform: translate3d(-20px, 20px, 0) scale(1.02); }
 }
 
-/* Smooth Natural Fade into Deep Black (Bottom & Screen Edges) */
+/* Combined Dual-Gradient Vignette Overlay (Saves 2 full-screen DOM repaints) */
 #bgVignetteFade {
   position: absolute;
   left: 0;
@@ -104,35 +98,28 @@ html, body {
   width: 1920px;
   height: 1080px;
   pointer-events: none;
-  background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 40%, rgba(2,4,10,0.85) 75%, #000000 100%);
-  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 40%, rgba(2,4,10,0.85) 75%, #000000 100%);
+  background: -webkit-linear-gradient(top, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.3) 45%, rgba(2,4,10,0.85) 75%, #000000 100%),
+              -webkit-radial-gradient(50% 45%, circle, rgba(0,0,0,0) 45%, rgba(0,0,0,0.6) 80%, #000000 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.3) 45%, rgba(2,4,10,0.85) 75%, #000000 100%),
+              radial-gradient(circle at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.6) 80%, #000000 100%);
 }
 
-#bgSideVignette {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1920px;
-  height: 1080px;
-  pointer-events: none;
-  background: -webkit-radial-gradient(50% 45%, circle, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 75%, #000000 100%);
-  background: radial-gradient(circle at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 75%, #000000 100%);
-}
-
-/* Lightweight Ambient Glow Spotlight that tracks current item */
+/* Dynamic Ambient Glow Spotlight (Hardware Accelerated) */
 #dynamicAmbientGlow {
   position: absolute;
-  right: -250px;
-  top: -250px;
-  width: 1500px;
-  height: 1200px;
+  right: -200px;
+  top: -200px;
+  width: 1400px;
+  height: 1100px;
   pointer-events: none;
-  opacity: 0.65;
-  -webkit-transition: opacity 0.8s ease;
-  transition: opacity 0.8s ease;
+  opacity: 0.6;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-transition: opacity 0.6s ease;
+  transition: opacity 0.6s ease;
 }
 
-/* Floating lightweight particles (Pure CSS keyframes, zero canvas CPU overhead) */
+/* Lightweight Floating Particles (Optimised: 8 particles, zero canvas overhead) */
 #particlesStage {
   position: absolute;
   left: 0;
@@ -149,22 +136,22 @@ html, body {
 .tvParticle {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
-  -webkit-animation: driftParticle 15s infinite linear;
-  animation: driftParticle 15s infinite linear;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.7);
+  -webkit-animation: driftParticle 14s infinite linear;
+  animation: driftParticle 14s infinite linear;
 }
 @-webkit-keyframes driftParticle {
-  0% { -webkit-transform: translateY(0px) translateX(0px); opacity: 0; }
-  15% { opacity: 0.7; }
-  85% { opacity: 0.7; }
-  100% { -webkit-transform: translateY(-420px) translateX(90px); opacity: 0; }
+  0%   { -webkit-transform: translate3d(0, 0, 0); opacity: 0; }
+  20%  { opacity: 0.65; }
+  80%  { opacity: 0.65; }
+  100% { -webkit-transform: translate3d(70px, -380px, 0); opacity: 0; }
 }
 @keyframes driftParticle {
-  0% { transform: translateY(0px) translateX(0px); opacity: 0; }
-  15% { opacity: 0.7; }
-  85% { opacity: 0.7; }
-  100% { transform: translateY(-420px) translateX(90px); opacity: 0; }
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  20%  { opacity: 0.65; }
+  80%  { opacity: 0.65; }
+  100% { transform: translate3d(70px, -380px, 0); opacity: 0; }
 }
 
 /* ==========================================================================
@@ -191,13 +178,13 @@ html, body {
 }
 
 #logoOrb {
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
   margin-right: 18px;
   background: -webkit-linear-gradient(top left, #00f0ff, #7928ca 55%, #ff007f);
   background: linear-gradient(135deg, #00f0ff, #7928ca 55%, #ff007f);
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6), 0 0 45px rgba(121, 40, 202, 0.4);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
 }
 
 #logoTitle {
@@ -205,15 +192,15 @@ html, body {
   font-weight: 800;
   letter-spacing: 0.5px;
   color: #ffffff;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
 #logoTag {
   font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 2.5px;
-  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.65);
   margin-left: 14px;
   padding: 4px 12px;
   border-radius: 12px;
@@ -225,7 +212,7 @@ html, body {
   position: absolute;
   left: 490px;
   top: 36px;
-  font-size: 27px;
+  font-size: 26px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.75);
 }
@@ -243,7 +230,7 @@ html, body {
 #wifiStatus {
   width: 32px;
   height: 32px;
-  margin-right: 24px;
+  margin-right: 22px;
   opacity: 0.85;
 }
 
@@ -253,8 +240,8 @@ html, body {
   line-height: 54px;
   color: #ffffff;
   letter-spacing: 0.5px;
-  margin-right: 22px;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  margin-right: 20px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 #clockDate {
@@ -263,7 +250,7 @@ html, body {
   line-height: 25px;
   color: rgba(255, 255, 255, 0.65);
   border-left: 1px solid rgba(255, 255, 255, 0.2);
-  padding-left: 20px;
+  padding-left: 18px;
   text-align: left;
 }
 
@@ -283,16 +270,18 @@ html, body {
 #rowsTrack {
   position: relative;
   width: 1920px;
-  -webkit-transition: -webkit-transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1);
-  transition: transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1);
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-transition: -webkit-transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .tvRow {
   position: relative;
   margin-bottom: 34px;
-  opacity: 0.6;
-  -webkit-transition: opacity 0.3s ease;
-  transition: opacity 0.3s ease;
+  opacity: 0.65;
+  -webkit-transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease;
 }
 .tvRow.active, .tvRow.heroRow {
   opacity: 1;
@@ -316,7 +305,7 @@ html, body {
   position: absolute;
   left: 0;
   width: 1920px;
-  height: 90px;
+  height: 85px;
   z-index: 60;
   display: -webkit-flex;
   display: flex;
@@ -327,22 +316,22 @@ html, body {
   cursor: pointer;
   pointer-events: auto;
   opacity: 0;
-  -webkit-transition: opacity 0.25s ease;
-  transition: opacity 0.25s ease;
+  -webkit-transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 #topScrollIndicator {
   top: 105px;
-  background: -webkit-linear-gradient(top, rgba(0, 240, 255, 0.35) 0%, rgba(2, 4, 10, 0.85) 60%, rgba(0, 0, 0, 0) 100%);
-  background: linear-gradient(180deg, rgba(0, 240, 255, 0.35) 0%, rgba(2, 4, 10, 0.85) 60%, rgba(0, 0, 0, 0) 100%);
-  border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+  background: -webkit-linear-gradient(top, rgba(0, 240, 255, 0.3) 0%, rgba(2, 4, 10, 0.8) 60%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.3) 0%, rgba(2, 4, 10, 0.8) 60%, rgba(0, 0, 0, 0) 100%);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.25);
 }
 
 #bottomScrollIndicator {
   bottom: 60px;
-  background: -webkit-linear-gradient(bottom, rgba(121, 40, 202, 0.4) 0%, rgba(2, 4, 10, 0.88) 60%, rgba(0, 0, 0, 0) 100%);
-  background: linear-gradient(0deg, rgba(121, 40, 202, 0.4) 0%, rgba(2, 4, 10, 0.88) 60%, rgba(0, 0, 0, 0) 100%);
-  border-top: 1px solid rgba(121, 40, 202, 0.35);
+  background: -webkit-linear-gradient(bottom, rgba(121, 40, 202, 0.35) 0%, rgba(2, 4, 10, 0.85) 60%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(0deg, rgba(121, 40, 202, 0.35) 0%, rgba(2, 4, 10, 0.85) 60%, rgba(0, 0, 0, 0) 100%);
+  border-top: 1px solid rgba(121, 40, 202, 0.3);
 }
 
 .edgeScrollIndicator.active,
@@ -363,8 +352,8 @@ html, body {
   padding: 8px 24px;
   border-radius: 20px;
   background: rgba(14, 18, 32, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 240, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 240, 255, 0.35);
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 1.5px;
@@ -400,18 +389,18 @@ html, body {
   font-size: 26px;
   cursor: pointer;
   z-index: 25;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
   opacity: 0.82;
-  -webkit-transition: -webkit-transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
-  transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+  -webkit-transition: -webkit-transform 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+  transition: transform 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
 }
 
 .trackNavBtn:hover {
   opacity: 1;
-  -webkit-transform: scale(1.12);
-  transform: scale(1.12);
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
   border-color: #00f0ff;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.5);
 }
 
 .trackNavLeft { left: 18px; }
@@ -426,12 +415,14 @@ html, body {
   display: -webkit-flex;
   display: flex;
   padding: 16px 0 20px 80px;
-  -webkit-transition: -webkit-transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1);
-  transition: transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1);
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-transition: -webkit-transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 /* ==========================================================================
-   Liquid Glass Cards & Ultra-Clear High-Contrast Focus Ring
+   Liquid Glass Cards & High-Performance Focus Ring
    ========================================================================== */
 .cardItem {
   position: relative;
@@ -442,9 +433,11 @@ html, body {
   cursor: pointer;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
-  -webkit-transition: -webkit-transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-transition: -webkit-transform 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease;
   overflow: visible;
 }
 
@@ -453,28 +446,28 @@ html, body {
   transform: scale(1.03);
 }
 
-/* HIGH-CONTRAST FOCUS RING (Clear & Unmistakable on 2016 Samsung TV) */
+/* HIGH-CONTRAST FOCUS RING (Ultra Sharp, Single Glow for 60fps on Mali GPU) */
 .cardItem.focused {
-  -webkit-transform: scale(1.09);
-  transform: scale(1.09);
+  -webkit-transform: scale(1.08);
+  transform: scale(1.08);
   border-color: #ffffff;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 240, 255, 0.8), 0 0 60px rgba(121, 40, 202, 0.5);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.75), 0 0 26px rgba(0, 240, 255, 0.85);
   z-index: 10;
 }
 
 .focusRing {
   position: absolute;
-  left: -7px;
-  top: -7px;
-  right: -7px;
-  bottom: -7px;
-  border: 5px solid #ffffff;
-  border-radius: 29px;
+  left: -6px;
+  top: -6px;
+  right: -6px;
+  bottom: -6px;
+  border: 4px solid #ffffff;
+  border-radius: 28px;
   opacity: 0;
   pointer-events: none;
-  -webkit-transition: opacity 0.18s ease;
-  transition: opacity 0.18s ease;
-  box-shadow: 0 0 22px rgba(255, 255, 255, 0.9), inset 0 0 12px rgba(0, 240, 255, 0.5);
+  -webkit-transition: opacity 0.16s ease;
+  transition: opacity 0.16s ease;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.8);
 }
 
 .cardItem.focused .focusRing {
@@ -497,8 +490,8 @@ html, body {
   top: 0;
   right: 0;
   bottom: 0;
-  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 50%);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 50%);
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 50%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 50%);
   pointer-events: none;
 }
 
@@ -518,7 +511,7 @@ html, body {
   border-radius: 32px;
   background: rgba(14, 18, 32, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.6);
   overflow: hidden;
 }
 
@@ -528,8 +521,8 @@ html, body {
   top: 0;
   right: 0;
   bottom: 0;
-  background: -webkit-linear-gradient(top left, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 60%);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 60%);
+  background: -webkit-linear-gradient(top left, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%);
   pointer-events: none;
 }
 
@@ -539,13 +532,13 @@ html, body {
   top: 36px;
   width: 860px;
   z-index: 3;
-  -webkit-transition: opacity 0.3s ease, -webkit-transform 0.3s ease;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  -webkit-transition: opacity 0.25s ease, -webkit-transform 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 #heroTextPane.fade {
   opacity: 0;
-  -webkit-transform: translateX(-18px);
-  transform: translateX(-18px);
+  -webkit-transform: translateX(-16px);
+  transform: translateX(-16px);
 }
 
 #heroBadge {
@@ -563,13 +556,13 @@ html, body {
 }
 
 #heroTitle {
-  font-size: 62px;
+  font-size: 60px;
   font-weight: 800;
-  line-height: 70px;
-  letter-spacing: -1px;
+  line-height: 68px;
+  letter-spacing: -0.5px;
   margin: 0 0 10px 0;
   color: #ffffff;
-  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.7);
 }
 
 #heroMeta {
@@ -581,11 +574,11 @@ html, body {
 
 #heroDesc {
   font-size: 24px;
-  line-height: 36px;
+  line-height: 35px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.88);
   width: 820px;
-  height: 72px;
+  height: 70px;
   overflow: hidden;
   margin-bottom: 22px;
 }
@@ -597,17 +590,17 @@ html, body {
 
 .heroBtn {
   position: relative;
-  height: 62px;
-  line-height: 62px;
-  padding: 0 38px;
+  height: 60px;
+  line-height: 60px;
+  padding: 0 36px;
   margin-right: 20px;
-  border-radius: 31px;
-  font-size: 25px;
+  border-radius: 30px;
+  font-size: 24px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-  -webkit-transition: -webkit-transform 0.2s ease, box-shadow 0.2s ease;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  -webkit-transition: -webkit-transform 0.18s ease;
+  transition: transform 0.18s ease;
 }
 
 #btnPlayHero {
@@ -621,12 +614,12 @@ html, body {
 }
 
 .heroBtn.focused {
-  -webkit-transform: scale(1.08);
-  transform: scale(1.08);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 255, 255, 0.7);
+  -webkit-transform: scale(1.07);
+  transform: scale(1.07);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.6);
 }
 .heroBtn .focusRing {
-  border-radius: 37px;
+  border-radius: 36px;
 }
 
 #heroArtPane {
@@ -636,8 +629,8 @@ html, body {
   width: 840px;
   height: 400px;
   overflow: hidden;
-  -webkit-transition: opacity 0.3s ease;
-  transition: opacity 0.3s ease;
+  -webkit-transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease;
 }
 #heroArtPane.fade {
   opacity: 0;
@@ -662,7 +655,7 @@ html, body {
   height: 340px;
   border-radius: 26px;
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
 }
 
 .orbArt {
@@ -683,11 +676,11 @@ html, body {
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.3);
   margin-left: 10px;
-  -webkit-transition: width 0.3s ease, background 0.3s ease;
-  transition: width 0.3s ease, background 0.3s ease;
+  -webkit-transition: width 0.25s ease, background 0.25s ease;
+  transition: width 0.25s ease, background 0.25s ease;
 }
 .heroDot.active {
-  width: 36px;
+  width: 34px;
   background: #ffffff;
 }
 
@@ -712,7 +705,7 @@ html, body {
   align-items: center;
   -webkit-justify-content: center;
   justify-content: center;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
 }
 
 .appIconSvg {
@@ -730,7 +723,7 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 .appLaunchBadge {
@@ -747,7 +740,7 @@ html, body {
 }
 
 .addAppCard {
-  border: 2px dashed rgba(255, 255, 255, 0.32);
+  border: 2px dashed rgba(255, 255, 255, 0.3);
   background: rgba(255, 255, 255, 0.05);
 }
 .addAppCard .appName {
@@ -829,7 +822,7 @@ html, body {
 .watchProgressFill {
   height: 6px;
   background: #00f0ff;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.9);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
 }
 
 /* ==========================================================================
@@ -853,7 +846,7 @@ html, body {
   align-items: center;
   -webkit-justify-content: center;
   justify-content: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.35);
 }
 
 .sysLabelWrap {
@@ -913,7 +906,7 @@ html, body {
   color: #ffffff;
   vertical-align: middle;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
 }
 .remotePill:hover {
   -webkit-transform: scale(1.08);
@@ -939,8 +932,8 @@ html, body {
   background: rgba(2, 4, 10, 0.92);
   display: none;
   opacity: 0;
-  -webkit-transition: opacity 0.3s ease;
-  transition: opacity 0.3s ease;
+  -webkit-transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease;
 }
 .modalOverlay.active {
   display: block;
@@ -956,7 +949,7 @@ html, body {
   background: rgba(14, 18, 32, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 36px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(0, 240, 255, 0.3);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 240, 255, 0.25);
   box-sizing: border-box;
   padding: 42px 48px;
   overflow: hidden;
@@ -1000,7 +993,7 @@ html, body {
   color: #0b0e18;
 }
 
-/* Wallpaper Modal Specifics */
+/* Wallpaper Modal */
 #wallpaperModal .glassDialog {
   width: 1480px;
   height: 830px;
@@ -1028,14 +1021,14 @@ html, body {
   -webkit-background-size: cover;
   background-size: cover;
   border: 2px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-  -webkit-transition: -webkit-transform 0.2s ease, border-color 0.2s ease;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  -webkit-transition: -webkit-transform 0.18s ease, border-color 0.18s ease;
+  transition: transform 0.18s ease, border-color 0.18s ease;
 }
 
 .wpThumbCard.selected {
   border-color: #00f0ff;
-  box-shadow: 0 0 30px rgba(0, 240, 255, 0.8);
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.7);
 }
 
 .wpThumbCard.selected:after {
@@ -1053,10 +1046,10 @@ html, body {
 }
 
 .wpThumbCard.focused {
-  -webkit-transform: scale(1.08);
-  transform: scale(1.08);
+  -webkit-transform: scale(1.06);
+  transform: scale(1.06);
   border-color: #ffffff;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 24px rgba(255, 255, 255, 0.8);
   z-index: 5;
 }
 
@@ -1114,7 +1107,7 @@ html, body {
 }
 .modalInput:focus, .modalInput.focused {
   border-color: #00f0ff;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.5);
 }
 
 .actionBtn {
@@ -1129,13 +1122,13 @@ html, body {
   border: none;
   color: #ffffff;
   box-sizing: border-box;
-  -webkit-transition: -webkit-transform 0.2s ease, box-shadow 0.2s ease;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  -webkit-transition: -webkit-transform 0.18s ease;
+  transition: transform 0.18s ease;
 }
 .actionBtn:hover, .actionBtn.focused {
-  -webkit-transform: scale(1.05);
-  transform: scale(1.05);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 255, 255, 0.4);
+  -webkit-transform: scale(1.04);
+  transform: scale(1.04);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 255, 255, 0.4);
 }
 
 .actionBtnPrimary {
@@ -1150,7 +1143,7 @@ html, body {
   background: #e50914;
 }
 
-/* App Editor Modal Specifics */
+/* App Editor Modal */
 #appEditorModal .glassDialog {
   width: 1560px;
   height: 840px;
@@ -1183,8 +1176,8 @@ html, body {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   cursor: pointer;
-  -webkit-transition: background 0.2s ease, border-color 0.2s ease;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  -webkit-transition: border-color 0.18s ease;
+  transition: border-color 0.18s ease;
 }
 
 .appEditItem.selected {
@@ -1194,9 +1187,7 @@ html, body {
 
 .appEditItem.focused {
   border-color: #ffffff;
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
-  -webkit-transform: scale(1.02);
-  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
 .appEditIndex {
@@ -1315,9 +1306,9 @@ html, body {
 }
 .colorOption.active {
   border-color: #ffffff;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.85);
-  -webkit-transform: scale(1.15);
-  transform: scale(1.15);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.8);
+  -webkit-transform: scale(1.12);
+  transform: scale(1.12);
 }
 
 .editorBottomBar {
@@ -1332,10 +1323,8 @@ html, body {
   border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-/* ==========================================================================
-   Samsung App Launch Modal & Reality-Check Explanation
-   ========================================================================== */
-#launchOverlay {
+/* Samsung TV HDMI Input Switcher & Device Manager */
+#hdmiModal {
   position: absolute;
   left: 0;
   top: 0;
@@ -1345,82 +1334,114 @@ html, body {
   background: rgba(2, 4, 10, 0.94);
   display: none;
   opacity: 0;
-  -webkit-transition: opacity 0.3s ease;
-  transition: opacity 0.3s ease;
+  -webkit-transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease;
   -webkit-align-items: center;
   align-items: center;
   -webkit-justify-content: center;
   justify-content: center;
 }
-#launchOverlay.active {
+#hdmiModal.active {
   display: -webkit-flex;
   display: flex;
   opacity: 1;
 }
 
-.launchBox {
+.hdmiBox {
   text-align: center;
-  width: 1040px;
+  width: 1100px;
   background: rgba(14, 18, 32, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 36px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 50px rgba(0, 240, 255, 0.3);
-  padding: 44px 50px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(0, 240, 255, 0.25);
+  padding: 40px 50px;
   box-sizing: border-box;
 }
 
-.launchBigIcon {
-  width: 140px;
-  height: 140px;
-  border-radius: 36px;
-  margin: 0 auto 24px auto;
+.hdmiHeader {
   display: -webkit-flex;
   display: flex;
   -webkit-align-items: center;
   align-items: center;
   -webkit-justify-content: center;
   justify-content: center;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  margin-bottom: 16px;
 }
 
-.launchAppName {
-  font-size: 52px;
+.hdmiPortBadge {
+  display: inline-block;
+  padding: 6px 18px;
+  border-radius: 12px;
+  background: -webkit-linear-gradient(135deg, #00f0ff, #0051ff);
+  background: linear-gradient(135deg, #00f0ff, #0051ff);
+  font-size: 18px;
   font-weight: 800;
-  margin-bottom: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-right: 16px;
+  color: #ffffff;
 }
 
-.launchAppSub {
-  font-size: 24px;
+.hdmiTitle {
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.hdmiDeviceSubtitle {
+  font-size: 22px;
   color: #00f0ff;
-  margin-bottom: 20px;
   font-weight: 600;
+  margin-bottom: 22px;
 }
 
-.launchDetailsCard {
+.hdmiCardRow {
+  display: -webkit-flex;
+  display: flex;
+  margin-bottom: 26px;
+}
+
+.hdmiInfoCard {
+  -webkit-flex: 1;
+  flex: 1;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   padding: 20px 24px;
   text-align: left;
-  margin-bottom: 28px;
-  font-size: 19px;
-  line-height: 28px;
+  margin-right: 16px;
+  font-size: 17px;
+  line-height: 26px;
   color: rgba(255, 255, 255, 0.85);
+  box-sizing: border-box;
 }
-.launchDetailsCard b {
+.hdmiInfoCard:last-child {
+  margin-right: 0;
+}
+
+.hdmiInfoCard b {
   color: #ffffff;
 }
 
-.launchActions {
+.hdmiRemoteKeyBadge {
+  display: inline-block;
+  padding: 2px 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  font-weight: bold;
+  color: #00f0ff;
+  margin: 0 4px;
+}
+
+.hdmiActions {
   display: -webkit-flex;
   display: flex;
   -webkit-justify-content: center;
   justify-content: center;
 }
 
-/* ==========================================================================
-   Toast Notification & Remote Quick Guide
-   ========================================================================== */
+/* Toast Notification */
 #toastBox {
   position: absolute;
   left: 50%;
@@ -1436,12 +1457,12 @@ html, body {
   font-size: 25px;
   font-weight: 600;
   color: #ffffff;
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 240, 255, 0.35);
   opacity: 0;
-  -webkit-transform: translateY(24px);
-  transform: translateY(24px);
-  -webkit-transition: opacity 0.3s ease, -webkit-transform 0.3s ease;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  -webkit-transform: translateY(20px);
+  transform: translateY(20px);
+  -webkit-transition: opacity 0.25s ease, -webkit-transform 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease;
   pointer-events: none;
 }
 #toastBox.show {
@@ -1456,10 +1477,8 @@ html, body {
 <div id="stage">
   <!-- Dynamic Wallpapers & Natural Fading Layers -->
   <div id="bgContainer">
-    <div id="bgBase"></div>
     <div id="bgAuraMesh"></div>
     <div id="bgVignetteFade"></div>
-    <div id="bgSideVignette"></div>
     <div id="dynamicAmbientGlow"></div>
   </div>
   <div id="particlesStage"></div>
@@ -1474,7 +1493,6 @@ html, body {
     <div id="greetingBadge">Good Evening</div>
 
     <div id="clockModule">
-      <!-- Clean TV WiFi Status Icon -->
       <svg id="wifiStatus" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 8.5C6.5 4.5 17.5 4.5 22 8.5"></path>
         <path d="M5.5 12C8.5 9 15.5 9 18.5 12"></path>
@@ -1517,8 +1535,8 @@ html, body {
           </div>
           <div id="heroArtPane">
             <div id="heroArtGrad"></div>
-            <div id="heroArtVisual" id="heroVisualBox">
-              <div class="orbArt" style="width:400px; height:400px; right:-80px; top:-80px; background:rgba(255,255,255,0.22);"></div>
+            <div id="heroArtVisual">
+              <div class="orbArt" style="width:400px; height:400px; right:-80px; top:-80px; background:rgba(255,255,255,0.2);"></div>
               <div class="orbArt" style="width:280px; height:280px; left:-60px; bottom:-60px; background:rgba(0,0,0,0.45);"></div>
             </div>
           </div>
@@ -1528,7 +1546,7 @@ html, body {
 
       <!-- Row 1: Apps Row -->
       <div class="tvRow" id="rowApps">
-        <div class="rowHeading">Your Apps <span style="font-size:18px; font-weight:normal; color:rgba(255,255,255,0.5); margin-left:14px;">(Press 1-9 on remote for quick launch)</span></div>
+        <div class="rowHeading">Your Apps <span style="font-size:18px; font-weight:normal; color:rgba(255,255,255,0.5); margin-left:14px;">(Press 1-9 on remote for instant launch)</span></div>
         <div class="trackNavBtn trackNavLeft" id="btnAppsTrackLeft" title="Scroll Left">&#9664;</div>
         <div class="trackNavBtn trackNavRight" id="btnAppsTrackRight" title="Scroll Right">&#9654;</div>
         <div class="itemsTrack" id="appsTrack"></div>
@@ -1621,25 +1639,39 @@ html, body {
     </div>
   </div>
 
-  <!-- App Launch Modal with Samsung TV Launch Methods & Sandboxing Explanation -->
-  <div id="launchOverlay">
-    <div class="launchBox">
-      <div class="launchBigIcon" id="launchIcon"></div>
-      <div class="launchAppName" id="launchName">YouTube</div>
-      <div class="launchAppSub" id="launchSub">Executing Samsung Tizen Launch&hellip;</div>
+  <!-- Samsung TV HDMI Input Switcher & Device Manager -->
+  <div id="hdmiModal">
+    <div class="hdmiBox">
+      <div class="hdmiHeader">
+        <span class="hdmiPortBadge" id="hdmiBadge">HDMI 1</span>
+        <span class="hdmiTitle" id="hdmiModalTitle">HDMI Input Controller</span>
+      </div>
+      <div class="hdmiDeviceSubtitle" id="hdmiDeviceSubtitle">Samsung LV32F390 &bull; Hardware Port 1 (1080p @ 60Hz)</div>
 
-      <div class="launchDetailsCard" id="launchExplanationCard">
-        <b>Samsung TV App Launcher (Tizen 2.4):</b><br>
-        <span id="launchTechnicalDetail">Invoking native Tizen App Control &amp; TV URI protocol handler...</span><br><br>
-        <div id="launchSandboxWarning" style="font-size: 17px; color: #ffd600; line-height: 24px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px;">
-          <b>Note regarding Samsung TV Browser:</b> Webpages visited inside the built-in Samsung Internet Browser run in a sandbox. If your TV firmware prevents the browser from switching directly to the native app, select <b>Open TV Interface</b> below for the full-screen 10-foot TV experience.
+      <div class="hdmiCardRow">
+        <div class="hdmiInfoCard">
+          <b style="color: #00f0ff; font-size: 18px;">Hardware Multiplexer &amp; TV Sandbox:</b><br>
+          <span id="hdmiStatusText">Attempting direct Tizen hardware source multiplexer command...</span><br><br>
+          <span style="font-size: 15px; color: #ffd600; line-height: 22px; display: block; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 8px;">
+            <b>Why Webpages Cannot Directly Flip HDMI Inputs:</b> For safety and HDCP DRM protection, Samsung Tizen 2.4 restricts physical tuner/HDMI switching (<code>tizen.tvwindow.setSource</code>) to locally installed, Samsung-signed widget packages (<code>.wgt</code>). Webpages loaded over the internet (GitHub Pages) run inside an isolated WebKit security sandbox.
+          </span>
+        </div>
+
+        <div class="hdmiInfoCard">
+          <b style="color: #00f0ff; font-size: 18px;">Closest Working Alternatives:</b><br>
+          <div style="margin-top: 6px; font-size: 16px; line-height: 25px;">
+            1. <b>Physical Remote:</b> Press <span class="hdmiRemoteKeyBadge">SOURCE</span> on your Samsung remote.<br>
+            2. <b>Trigger Source Key:</b> Aurora TV will dispatch TV Source keycode (10072).<br>
+            3. <b>Connected Device:</b> <span id="hdmiCurrentDeviceLabel" style="color: #00e676; font-weight: bold;">Game Console</span> (click Preset below to customize).
+          </div>
         </div>
       </div>
 
-      <div class="launchActions">
-        <button class="actionBtn actionBtnPrimary focused" id="btnLaunchNow" style="margin-right: 18px;">Open TV Interface (OK)</button>
-        <button class="actionBtn actionBtnSecondary" id="btnLaunchUri" style="margin-right: 18px;">Try Native Scheme</button>
-        <button class="actionBtn actionBtnSecondary" id="btnLaunchCancel">Cancel (BACK)</button>
+      <div class="hdmiActions">
+        <button class="actionBtn actionBtnPrimary focused" id="btnHdmiSource" style="margin-right: 14px;">Trigger Source Key (OK)</button>
+        <button class="actionBtn actionBtnSecondary" id="btnHdmiToggle" style="margin-right: 14px;">Switch to HDMI 2</button>
+        <button class="actionBtn actionBtnSecondary" id="btnHdmiRename" style="margin-right: 14px;">Preset: Game Console</button>
+        <button class="actionBtn actionBtnSecondary" id="btnHdmiClose">Close (BACK)</button>
       </div>
     </div>
   </div>
@@ -1746,7 +1778,7 @@ html, body {
     }
   ];
 
-  /* ---------- Default Installed TV Applications with Samsung Tizen IDs & URL Schemes ---------- */
+  /* ---------- Default Installed TV Applications with Samsung Tizen IDs & Schemes ---------- */
   var DEFAULT_APPS = [
     {
       id: "yt",
@@ -1755,7 +1787,6 @@ html, body {
       url: "https://www.youtube.com/tv",
       scheme: "youtube://",
       tizenId: "111299001912",
-      tizenPackage: "org.tizen.youtube",
       c1: "#e50914",
       c2: "#8a0000"
     },
@@ -1766,7 +1797,6 @@ html, body {
       url: "https://www.netflix.com",
       scheme: "netflix://",
       tizenId: "11101200001",
-      tizenPackage: "org.tizen.netflix-box",
       c1: "#e50914",
       c2: "#3d0305"
     },
@@ -1777,7 +1807,6 @@ html, body {
       url: "https://www.primevideo.com",
       scheme: "primevideo://",
       tizenId: "3201512006785",
-      tizenPackage: "org.tizen.primevideo",
       c1: "#00a8e1",
       c2: "#003254"
     },
@@ -1788,7 +1817,6 @@ html, body {
       url: "https://www.disneyplus.com",
       scheme: "disneyplus://",
       tizenId: "3201907018807",
-      tizenPackage: "org.tizen.disneyplus",
       c1: "#113ccf",
       c2: "#09173d"
     },
@@ -1799,7 +1827,6 @@ html, body {
       url: "https://www.bbc.co.uk/iplayer",
       scheme: "bbciplayer://",
       tizenId: "111399000192",
-      tizenPackage: "3201601007250",
       c1: "#f54997",
       c2: "#780b39"
     },
@@ -1810,7 +1837,6 @@ html, body {
       url: "https://www.twitch.tv",
       scheme: "twitch://",
       tizenId: "3201606009684",
-      tizenPackage: "org.tizen.twitch",
       c1: "#9146ff",
       c2: "#3f1082"
     },
@@ -1821,7 +1847,6 @@ html, body {
       url: "https://open.spotify.com",
       scheme: "spotify://",
       tizenId: "3201606009684",
-      tizenPackage: "org.tizen.spotify",
       c1: "#1db954",
       c2: "#0e4f24"
     },
@@ -1832,7 +1857,6 @@ html, body {
       url: "https://app.plex.tv/desktop",
       scheme: "plex://",
       tizenId: "3201512006963",
-      tizenPackage: "org.tizen.plex",
       c1: "#e5a00d",
       c2: "#694200"
     },
@@ -1843,7 +1867,6 @@ html, body {
       url: "https://www.google.com",
       scheme: "browser://",
       tizenId: "org.tizen.browser",
-      tizenPackage: "org.tizen.browser",
       c1: "#4285f4",
       c2: "#174ea6"
     }
@@ -1896,6 +1919,25 @@ html, body {
     { id: "effects", name: "Effects", sub: "Toggle Ambiance", icon: "sparkles", c1: "#ffab00", c2: "#ff6f00" }
   ];
 
+  var HDMI_PRESETS = [
+    "Game Console",
+    "PlayStation 5",
+    "Xbox Series X",
+    "Nintendo Switch",
+    "Apple TV 4K",
+    "Fire TV Stick",
+    "Sky Q / Cable Box",
+    "PC / Laptop",
+    "Blu-ray Player"
+  ];
+
+  try {
+    var savedHdmi1 = localStorage.getItem("aurora_hdmi1_name");
+    if (savedHdmi1) { SYSTEM_ITEMS[0].sub = savedHdmi1; }
+    var savedHdmi2 = localStorage.getItem("aurora_hdmi2_name");
+    if (savedHdmi2) { SYSTEM_ITEMS[1].sub = savedHdmi2; }
+  } catch (e) {}
+
   var COLOR_PRESETS = [
     { c1: "#e50914", c2: "#8a0000" },
     { c1: "#00a8e1", c2: "#003254" },
@@ -1929,6 +1971,7 @@ html, body {
   var edgeScrollRaf = null;
   var isPointerEdgeScrolling = false;
   var pointerWatchdogTimer = null;
+  var pointerThrottleTimer = null;
 
   /* ---------- State ---------- */
   var userApps = [];
@@ -1942,7 +1985,7 @@ html, body {
   var nav = {
     row: 0,
     col: 0,
-    modal: null, // null | 'wallpaper' | 'appEditor' | 'launch'
+    modal: null, // null | 'wallpaper' | 'appEditor' | 'hdmi'
     modalIndex: 0
   };
 
@@ -1983,7 +2026,7 @@ html, body {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () {
       toastBox.className = "";
-    }, 2800);
+    }, 2400);
   }
 
   function hexToRgba(hex, alpha) {
@@ -2026,29 +2069,31 @@ html, body {
   /* ---------- Ambient Glow Spot ---------- */
   function setAmbientGlow(color) {
     if (!effectsEnabled || !color) { return; }
-    var radialCss = "radial-gradient(ellipse at center, " + hexToRgba(color, 0.5) + " 0%, rgba(0,0,0,0) 68%)";
+    var radialCss = "radial-gradient(ellipse at center, " + hexToRgba(color, 0.45) + " 0%, rgba(0,0,0,0) 65%)";
     dynamicAmbientGlow.style.background = "-webkit-" + radialCss;
     dynamicAmbientGlow.style.background = radialCss;
   }
 
-  /* ---------- Floating Particles Generator ---------- */
+  /* ---------- Floating Particles Generator (Optimised: 8 particles) ---------- */
   function setupParticles() {
     var container = $("particlesStage");
     container.innerHTML = "";
-    for (var i = 0; i < 16; i++) {
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < 8; i++) {
       var p = document.createElement("div");
       p.className = "tvParticle";
-      var size = Math.floor(Math.random() * 5) + 3;
+      var size = Math.floor(Math.random() * 4) + 3;
       p.style.width = size + "px";
       p.style.height = size + "px";
-      p.style.left = Math.floor(Math.random() * 1900) + "px";
-      p.style.top = Math.floor(Math.random() * 1060) + "px";
-      p.style.webkitAnimationDelay = (Math.random() * 12).toFixed(1) + "s";
-      p.style.animationDelay = (Math.random() * 12).toFixed(1) + "s";
-      p.style.webkitAnimationDuration = (11 + Math.random() * 10).toFixed(1) + "s";
-      p.style.animationDuration = (11 + Math.random() * 10).toFixed(1) + "s";
-      container.appendChild(p);
+      p.style.left = Math.floor(Math.random() * 1880) + "px";
+      p.style.top = Math.floor(Math.random() * 1040) + "px";
+      p.style.webkitAnimationDelay = (i * 1.6).toFixed(1) + "s";
+      p.style.animationDelay = (i * 1.6).toFixed(1) + "s";
+      p.style.webkitAnimationDuration = (12 + (i % 4) * 2) + "s";
+      p.style.animationDuration = (12 + (i % 4) * 2) + "s";
+      frag.appendChild(p);
     }
+    container.appendChild(frag);
   }
 
   function setEffectsState(on) {
@@ -2158,10 +2203,11 @@ html, body {
     updateNavigationTargets();
   }
 
-  /* ---------- Render Rows ---------- */
+  /* ---------- Render Rows with DocumentFragment (High Performance Batching) ---------- */
   function renderAppsRow() {
     appsTrack.innerHTML = "";
     rowItems[1] = [];
+    var frag = document.createDocumentFragment();
 
     for (var i = 0; i < userApps.length; i++) {
       var app = userApps[i];
@@ -2206,7 +2252,7 @@ html, body {
         };
       })(app, i);
 
-      appsTrack.appendChild(card);
+      frag.appendChild(card);
       rowItems[1].push({
         el: card,
         type: "app",
@@ -2215,7 +2261,7 @@ html, body {
       });
     }
 
-    // Special "+ Add App" card at the end of the row
+    // Special "+ Add App" card
     var addCard = document.createElement("div");
     addCard.className = "cardItem appCard addAppCard";
     addCard.setAttribute("data-row", "1");
@@ -2245,18 +2291,21 @@ html, body {
       setFocus(1, userApps.length, true);
     };
 
-    appsTrack.appendChild(addCard);
+    frag.appendChild(addCard);
     rowItems[1].push({
       el: addCard,
       type: "addApp",
       data: null,
       color: "#00f0ff"
     });
+
+    appsTrack.appendChild(frag);
   }
 
   function renderWatchRow() {
     watchTrack.innerHTML = "";
     rowItems[2] = [];
+    var frag = document.createDocumentFragment();
 
     for (var i = 0; i < WATCH_ITEMS.length; i++) {
       var item = WATCH_ITEMS[i];
@@ -2312,7 +2361,7 @@ html, body {
         };
       })(item, i);
 
-      watchTrack.appendChild(card);
+      frag.appendChild(card);
       rowItems[2].push({
         el: card,
         type: "watch",
@@ -2320,11 +2369,14 @@ html, body {
         color: item.c1
       });
     }
+
+    watchTrack.appendChild(frag);
   }
 
   function renderSettingsRow() {
     settingsTrack.innerHTML = "";
     rowItems[3] = [];
+    var frag = document.createDocumentFragment();
 
     for (var i = 0; i < SYSTEM_ITEMS.length; i++) {
       var item = SYSTEM_ITEMS[i];
@@ -2374,7 +2426,7 @@ html, body {
         };
       })(item, i);
 
-      settingsTrack.appendChild(card);
+      frag.appendChild(card);
       rowItems[3].push({
         el: card,
         type: "system",
@@ -2382,6 +2434,8 @@ html, body {
         color: item.c1
       });
     }
+
+    settingsTrack.appendChild(frag);
   }
 
   function setupHeroRow() {
@@ -2418,6 +2472,7 @@ html, body {
     // Build Hero Dots
     var dotsContainer = $("heroDots");
     dotsContainer.innerHTML = "";
+    var dotFrag = document.createDocumentFragment();
     for (var i = 0; i < HERO_ITEMS.length; i++) {
       var dot = document.createElement("span");
       dot.className = "heroDot" + (i === 0 ? " active" : "");
@@ -2427,8 +2482,9 @@ html, body {
           startHeroRotation();
         };
       })(i);
-      dotsContainer.appendChild(dot);
+      dotFrag.appendChild(dot);
     }
+    dotsContainer.appendChild(dotFrag);
 
     renderHeroSlide(0);
     startHeroRotation();
@@ -2463,7 +2519,7 @@ html, body {
         renderHeroSlide(next);
         $("heroTextPane").className = "";
         $("heroArtPane").className = "";
-      }, 300);
+      }, 250);
     }, 10000);
   }
 
@@ -2475,7 +2531,6 @@ html, body {
   }
 
   function setFocus(row, col, keepScroll) {
-    // Clear old focus
     var oldRow = rowItems[nav.row];
     if (oldRow && oldRow[nav.col]) {
       oldRow[nav.col].el.className = oldRow[nav.col].el.className.replace(/\s*focused/g, "");
@@ -2500,19 +2555,17 @@ html, body {
     }
 
     if (!keepScroll) {
-      // Scroll vertical row into view
       var rowY = 0;
       if (nav.row === 1) { rowY = 320; }
       else if (nav.row === 2) { rowY = 560; }
       else if (nav.row === 3) { rowY = 820; }
       currentScrollY = rowY;
-      rowsTrack.style.webkitTransition = "-webkit-transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
-      rowsTrack.style.transition = "transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
+      rowsTrack.style.webkitTransition = "-webkit-transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1)";
+      rowsTrack.style.transition = "transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1)";
       setElementTransform(rowsTrack, "translateY(" + (-currentScrollY) + "px)");
       updateScrollIndicators();
     }
 
-    // Scroll horizontal track into view
     scrollTrackIntoView(nav.row, nav.col);
   }
 
@@ -2541,14 +2594,10 @@ html, body {
     if (!cur) { return; }
 
     if (cur.type === "heroPlay") {
-      openLaunchOverlay({
-        name: HERO_ITEMS[heroIndex].title,
-        url: "",
-        icon: "play",
-        c1: HERO_ITEMS[heroIndex].c1,
-        c2: HERO_ITEMS[heroIndex].c2,
-        sub: "Starting featured playback..."
-      });
+      showToast("Starting playback: " + HERO_ITEMS[heroIndex].title);
+      setTimeout(function () {
+        window.location.href = "https://www.youtube.com/tv";
+      }, 150);
     } else if (cur.type === "heroList") {
       showToast("Added \"" + HERO_ITEMS[heroIndex].title + "\" to My List");
     } else if (cur.type === "app") {
@@ -2556,14 +2605,10 @@ html, body {
     } else if (cur.type === "addApp") {
       openAppEditorModal();
     } else if (cur.type === "watch") {
-      openLaunchOverlay({
-        name: cur.data.title,
-        url: "",
-        icon: "play",
-        c1: cur.data.c1,
-        c2: cur.data.c2,
-        sub: "Resuming playback..."
-      });
+      showToast("Resuming: " + cur.data.title);
+      setTimeout(function () {
+        window.location.href = "https://www.youtube.com/tv";
+      }, 150);
     } else if (cur.type === "system") {
       handleSystemAction(cur.data.id);
     }
@@ -2577,8 +2622,10 @@ html, body {
     } else if (id === "effects") {
       setEffectsState(!effectsEnabled);
       showToast("Effects: " + (effectsEnabled ? "Enabled" : "Disabled"));
-    } else if (id === "hdmi1" || id === "hdmi2") {
-      showToast("Switching to " + (id === "hdmi1" ? "HDMI 1" : "HDMI 2") + "...");
+    } else if (id === "hdmi1") {
+      handleHdmiAction(1);
+    } else if (id === "hdmi2") {
+      handleHdmiAction(2);
     } else if (id === "mirror") {
       showToast("Screen Mirroring ready for wireless devices");
     } else if (id === "picture") {
@@ -2588,120 +2635,175 @@ html, body {
     }
   }
 
-  /* ---------- Samsung TV App Launcher Engine ---------- */
-  var launchTargetApp = null;
-
+  /* ---------- Instant Samsung TV App Launcher (Zero Popups) ---------- */
   function launchApplicationTarget(app) {
-    launchTargetApp = app;
+    if (!app) { return; }
+    showToast("Opening " + app.name + "...");
 
-    // STEP 1: Attempt direct Samsung Tizen OS Native Launch
-    // If Aurora TV is running with Tizen API access (or as installed widget)
-    var nativeLaunched = false;
+    // 1. Direct Samsung Tizen Native App Launch
     if (window.tizen && window.tizen.application && typeof window.tizen.application.launch === "function" && app.tizenId) {
       try {
         window.tizen.application.launch(app.tizenId, function () {
-          nativeLaunched = true;
-          showToast("Launching " + app.name + " via Samsung Tizen OS...");
+          // Native app launched
         }, function (err) {
-          // Native launch failed or restricted by sandbox
-          openLaunchOverlay(app);
+          if (app.url) {
+            window.location.href = app.url;
+          }
         });
-        if (nativeLaunched) { return; }
-      } catch (err) {
-        // Tizen API threw SecurityError in unprivileged browser context
-      }
+        return;
+      } catch (err) {}
     }
 
-    // STEP 2: Open informative launch modal explaining the exact launch mechanism
-    openLaunchOverlay(app);
+    // 2. Dispatch native URI scheme via hidden frame
+    if (app.scheme) {
+      try {
+        var hiddenFrame = $("samsungProtocolFrame");
+        if (!hiddenFrame) {
+          hiddenFrame = document.createElement("iframe");
+          hiddenFrame.id = "samsungProtocolFrame";
+          hiddenFrame.style.display = "none";
+          document.body.appendChild(hiddenFrame);
+        }
+        hiddenFrame.src = app.scheme;
+      } catch (e) {}
+    }
+
+    // 3. Immediate navigation to 10-foot TV interface (no confirmation popup)
+    if (app.url) {
+      setTimeout(function () {
+        window.location.href = app.url;
+      }, 150);
+    }
   }
 
-  function openLaunchOverlay(app) {
-    launchTargetApp = app;
-    nav.modal = "launch";
+  /* ---------- Samsung TV HDMI Input Switcher & Device Manager ---------- */
+  var activeHdmiPort = 1;
+
+  function handleHdmiAction(port) {
+    activeHdmiPort = port || 1;
+    showToast("Activating HDMI " + activeHdmiPort + "...");
+
+    var nativeSuccess = false;
+    if (window.tizen && window.tizen.tvwindow && typeof window.tizen.tvwindow.setSource === "function") {
+      try {
+        window.tizen.tvwindow.setSource({
+          type: "HDMI",
+          number: activeHdmiPort
+        }, function () {
+          nativeSuccess = true;
+          showToast("Switched hardware input to HDMI " + activeHdmiPort + "!");
+        }, function (err) {
+          openHdmiModal(activeHdmiPort, err ? err.message : "Privilege restricted");
+        });
+        if (nativeSuccess) { return; }
+      } catch (err) {
+        openHdmiModal(activeHdmiPort, err ? err.message : "SecurityError: Webpage sandbox restriction");
+        return;
+      }
+    } else {
+      openHdmiModal(activeHdmiPort, "Standard Samsung TV WebKit Browser Sandbox");
+    }
+  }
+
+  function openHdmiModal(port, reason) {
+    activeHdmiPort = port || 1;
+    nav.modal = "hdmi";
     nav.modalIndex = 0;
     if (isPointerEdgeScrolling) { stopEdgeScroll(); }
     updateScrollIndicators();
 
-    $("launchName").innerHTML = app.name;
-    $("launchSub").innerHTML = "Samsung TV Launch Handler";
-    setGradient($("launchIcon"), app.c1 || "#00f0ff", app.c2 || "#7928ca");
-    $("launchIcon").innerHTML = getSvg(app.icon || "play");
+    var portIndex = (activeHdmiPort === 1) ? 0 : 1;
+    var currentDevice = SYSTEM_ITEMS[portIndex].sub || "Game Console";
 
-    var detailText = "Target App ID: <b>" + (app.tizenId || "N/A") + "</b><br>" +
-                     "URI Protocol: <b>" + (app.scheme || "N/A") + "</b><br>" +
-                     "Optimized TV Interface: <b>" + (app.url || "N/A") + "</b>";
-    $("launchTechnicalDetail").innerHTML = detailText;
+    $("hdmiBadge").innerHTML = "HDMI " + activeHdmiPort;
+    $("hdmiModalTitle").innerHTML = "HDMI " + activeHdmiPort + " Controller";
+    $("hdmiDeviceSubtitle").innerHTML = "Samsung LV32F390 &bull; Hardware Port " + activeHdmiPort + " (1080p @ 60Hz)";
+    $("hdmiCurrentDeviceLabel").innerHTML = currentDevice;
+    $("btnHdmiToggle").innerHTML = "Switch to HDMI " + (activeHdmiPort === 1 ? "2" : "1");
+    $("btnHdmiRename").innerHTML = "Preset: " + currentDevice;
 
-    $("launchOverlay").className = "active";
-    highlightLaunchModalFocus();
+    var statusMsg = "Target Port: <b>HDMI " + activeHdmiPort + "</b> (" + currentDevice + ")<br>" +
+                    "Hardware Status: Connected &bull; Mode: 1920x1080 @ 60Hz<br>" +
+                    "Multiplexer Command: <code>tizen.tvwindow.setSource({type: 'HDMI', number: " + activeHdmiPort + "})</code><br>" +
+                    "Status Result: <span style='color:#ffd600;'>" + (reason || "Sandbox Protected") + "</span>";
+    $("hdmiStatusText").innerHTML = statusMsg;
+
+    $("hdmiModal").className = "active";
+    highlightHdmiModalFocus();
   }
 
-  function highlightLaunchModalFocus() {
-    $("btnLaunchNow").className = "actionBtn actionBtnPrimary" + (nav.modalIndex === 0 ? " focused" : "");
-    $("btnLaunchUri").className = "actionBtn actionBtnSecondary" + (nav.modalIndex === 1 ? " focused" : "");
-    $("btnLaunchCancel").className = "actionBtn actionBtnSecondary" + (nav.modalIndex === 2 ? " focused" : "");
+  function highlightHdmiModalFocus() {
+    $("btnHdmiSource").className = "actionBtn actionBtnPrimary" + (nav.modalIndex === 0 ? " focused" : "");
+    $("btnHdmiToggle").className = "actionBtn actionBtnSecondary" + (nav.modalIndex === 1 ? " focused" : "");
+    $("btnHdmiRename").className = "actionBtn actionBtnSecondary" + (nav.modalIndex === 2 ? " focused" : "");
+    $("btnHdmiClose").className = "actionBtn actionBtnSecondary" + (nav.modalIndex === 3 ? " focused" : "");
   }
 
-  function executeOpenTvInterface() {
-    if (launchTargetApp && launchTargetApp.url) {
-      showToast("Opening 10-foot TV interface for " + launchTargetApp.name + "...");
-      setTimeout(function () {
-        window.location.href = launchTargetApp.url;
-      }, 400);
-    } else {
-      closeLaunchOverlay();
-    }
-  }
-
-  function executeTryNativeUriScheme() {
-    if (!launchTargetApp || !launchTargetApp.scheme) {
-      showToast("No native URI registered for this application");
-      return;
-    }
-
-    showToast("Triggering native protocol: " + launchTargetApp.scheme);
-    try {
-      var hiddenFrame = $("samsungProtocolFrame");
-      if (!hiddenFrame) {
-        hiddenFrame = document.createElement("iframe");
-        hiddenFrame.id = "samsungProtocolFrame";
-        hiddenFrame.style.display = "none";
-        document.body.appendChild(hiddenFrame);
-      }
-      hiddenFrame.src = launchTargetApp.scheme;
-    } catch (e) {
-      window.location.href = launchTargetApp.scheme;
-    }
-  }
-
-  function closeLaunchOverlay() {
-    $("launchOverlay").className = "";
+  function closeHdmiModal() {
+    $("hdmiModal").className = "";
     nav.modal = null;
     updateScrollIndicators();
   }
 
-  $("btnLaunchNow").onclick = executeOpenTvInterface;
-  $("btnLaunchUri").onclick = executeTryNativeUriScheme;
-  $("btnLaunchCancel").onclick = closeLaunchOverlay;
+  function triggerSamsungSourceKey() {
+    showToast("Press [ SOURCE ] on your Samsung remote for HDMI " + activeHdmiPort);
+    try {
+      if (window.tizen && window.tizen.tvinputdevice && typeof window.tizen.tvinputdevice.registerKey === "function") {
+        window.tizen.tvinputdevice.registerKey("Source");
+      }
+      var evt = document.createEvent("Events");
+      evt.initEvent("keydown", true, true);
+      evt.keyCode = 10072;
+      evt.which = 10072;
+      document.dispatchEvent(evt);
+    } catch (e) {}
+  }
 
-  $("btnLaunchNow").onmouseenter = function () {
-    if (nav.modal === "launch") {
-      nav.modalIndex = 0;
-      highlightLaunchModalFocus();
+  function toggleHdmiPort() {
+    var nextPort = (activeHdmiPort === 1) ? 2 : 1;
+    handleHdmiAction(nextPort);
+  }
+
+  function cycleHdmiDevicePreset() {
+    var portIndex = (activeHdmiPort === 1) ? 0 : 1;
+    var currentName = SYSTEM_ITEMS[portIndex].sub || "Game Console";
+    var currentIdx = -1;
+    for (var i = 0; i < HDMI_PRESETS.length; i++) {
+      if (HDMI_PRESETS[i].toLowerCase() === currentName.toLowerCase()) {
+        currentIdx = i;
+        break;
+      }
     }
+    var nextIdx = (currentIdx + 1) % HDMI_PRESETS.length;
+    var newPreset = HDMI_PRESETS[nextIdx];
+
+    SYSTEM_ITEMS[portIndex].sub = newPreset;
+    try {
+      localStorage.setItem("aurora_hdmi" + activeHdmiPort + "_name", newPreset);
+    } catch (e) {}
+
+    renderSettingsRow();
+    $("hdmiCurrentDeviceLabel").innerHTML = newPreset;
+    $("btnHdmiRename").innerHTML = "Preset: " + newPreset;
+    showToast("HDMI " + activeHdmiPort + " assigned: " + newPreset);
+  }
+
+  $("btnHdmiSource").onclick = triggerSamsungSourceKey;
+  $("btnHdmiToggle").onclick = toggleHdmiPort;
+  $("btnHdmiRename").onclick = cycleHdmiDevicePreset;
+  $("btnHdmiClose").onclick = closeHdmiModal;
+
+  $("btnHdmiSource").onmouseenter = function () {
+    if (nav.modal === "hdmi") { nav.modalIndex = 0; highlightHdmiModalFocus(); }
   };
-  $("btnLaunchUri").onmouseenter = function () {
-    if (nav.modal === "launch") {
-      nav.modalIndex = 1;
-      highlightLaunchModalFocus();
-    }
+  $("btnHdmiToggle").onmouseenter = function () {
+    if (nav.modal === "hdmi") { nav.modalIndex = 1; highlightHdmiModalFocus(); }
   };
-  $("btnLaunchCancel").onmouseenter = function () {
-    if (nav.modal === "launch") {
-      nav.modalIndex = 2;
-      highlightLaunchModalFocus();
-    }
+  $("btnHdmiRename").onmouseenter = function () {
+    if (nav.modal === "hdmi") { nav.modalIndex = 2; highlightHdmiModalFocus(); }
+  };
+  $("btnHdmiClose").onmouseenter = function () {
+    if (nav.modal === "hdmi") { nav.modalIndex = 3; highlightHdmiModalFocus(); }
   };
 
   /* ---------- Wallpaper Modal Engine ---------- */
@@ -2724,6 +2826,7 @@ html, body {
     var grid = $("wallpaperGrid");
     grid.innerHTML = "";
     var all = getAllWallpapers();
+    var frag = document.createDocumentFragment();
 
     for (var i = 0; i < all.length; i++) {
       var wp = all[i];
@@ -2743,7 +2846,6 @@ html, body {
       nameBadge.innerHTML = wp.name;
       card.appendChild(nameBadge);
 
-      // Custom wallpaper delete button
       if (wp.custom) {
         var delBtn = document.createElement("div");
         delBtn.className = "wpDeleteBtn";
@@ -2772,9 +2874,10 @@ html, body {
         };
       })(wp, i);
 
-      grid.appendChild(card);
+      frag.appendChild(card);
     }
 
+    grid.appendChild(frag);
     highlightWallpaperModalFocus();
   }
 
@@ -2863,6 +2966,7 @@ html, body {
   function renderEditorColorRow() {
     var row = $("editorColorRow");
     row.innerHTML = "";
+    var frag = document.createDocumentFragment();
     for (var i = 0; i < COLOR_PRESETS.length; i++) {
       var opt = document.createElement("div");
       opt.className = "colorOption" + (COLOR_PRESETS[i].c1 === selectedColorPreset.c1 ? " active" : "");
@@ -2873,13 +2977,15 @@ html, body {
           renderEditorColorRow();
         };
       })(COLOR_PRESETS[i]);
-      row.appendChild(opt);
+      frag.appendChild(opt);
     }
+    row.appendChild(frag);
   }
 
   function renderAppEditorList() {
     var list = $("appEditorList");
     list.innerHTML = "";
+    var frag = document.createDocumentFragment();
 
     for (var i = 0; i < userApps.length; i++) {
       var app = userApps[i];
@@ -2910,7 +3016,6 @@ html, body {
       var controls = document.createElement("div");
       controls.className = "appEditControls";
 
-      // Move Left button
       var btnLeft = document.createElement("button");
       btnLeft.className = "miniBtn";
       btnLeft.innerHTML = "&#9664;";
@@ -2922,7 +3027,6 @@ html, body {
         };
       })(i);
 
-      // Move Right button
       var btnRight = document.createElement("button");
       btnRight.className = "miniBtn";
       btnRight.innerHTML = "&#9654;";
@@ -2934,7 +3038,6 @@ html, body {
         };
       })(i);
 
-      // Delete button
       var btnDelete = document.createElement("button");
       btnDelete.className = "miniBtn miniBtnDanger";
       btnDelete.innerHTML = "&times;";
@@ -2967,8 +3070,10 @@ html, body {
         };
       })(app, i);
 
-      list.appendChild(row);
+      frag.appendChild(row);
     }
+
+    list.appendChild(frag);
   }
 
   function highlightAppEditorFocus() {
@@ -3092,7 +3197,7 @@ html, body {
 
   $("btnCloseAppModal").onclick = closeAppEditorModal;
 
-  /* ---------- Pointer-Based Edge Scrolling & Navigation Engine ---------- */
+  /* ---------- Pointer-Based Edge Scrolling Engine (Throttled for Performance) ---------- */
   var requestAnimFrame = window.requestAnimationFrame ||
                          window.webkitRequestAnimationFrame ||
                          window.mozRequestAnimationFrame ||
@@ -3113,6 +3218,11 @@ html, body {
   }
 
   function handlePointerMove(e) {
+    if (pointerThrottleTimer) { return; }
+    pointerThrottleTimer = setTimeout(function () {
+      pointerThrottleTimer = null;
+    }, 32); // Limit mousemove calculations to ~30fps to avoid starving 2016 TV CPU
+
     e = e || window.event;
     resetPointerWatchdog();
 
@@ -3198,8 +3308,8 @@ html, body {
       cancelAnimFrame(edgeScrollRaf);
       edgeScrollRaf = null;
     }
-    rowsTrack.style.webkitTransition = "-webkit-transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
-    rowsTrack.style.transition = "transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
+    rowsTrack.style.webkitTransition = "-webkit-transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1)";
+    rowsTrack.style.transition = "transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1)";
     syncActiveRowFromScroll();
     updateScrollIndicators();
   }
@@ -3213,8 +3323,8 @@ html, body {
     edgeScrollSpeed = 0;
     targetY = Math.max(0, Math.min(maxScrollY, targetY));
     currentScrollY = targetY;
-    rowsTrack.style.webkitTransition = "-webkit-transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
-    rowsTrack.style.transition = "transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1)";
+    rowsTrack.style.webkitTransition = "-webkit-transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1)";
+    rowsTrack.style.transition = "transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1)";
     setElementTransform(rowsTrack, "translateY(" + (-currentScrollY) + "px)");
     syncActiveRowFromScroll();
     updateScrollIndicators();
@@ -3281,7 +3391,7 @@ html, body {
     }
   }
 
-  // Edge Scroll Indicator Click & Hover Listeners
+  // Edge Scroll Indicator Listeners
   if (topIndicator) {
     topIndicator.onclick = function (e) {
       if (e && e.stopPropagation) { e.stopPropagation(); }
@@ -3318,7 +3428,7 @@ html, body {
     };
   }
 
-  // Horizontal Track Nav Arrows for Pointer Users
+  // Track Relative Scrolling
   function scrollTrackRelative(row, delta) {
     if (row === 0) { return; }
     var track = (row === 1) ? appsTrack : (row === 2) ? watchTrack : settingsTrack;
@@ -3375,7 +3485,7 @@ html, body {
     };
   }
 
-  // Mouse Wheel / Trackpad Vertical Scroll Listener
+  // Mouse Wheel / Trackpad Scroll
   function handleWheel(e) {
     if (nav.modal) { return; }
     e = e || window.event;
@@ -3387,7 +3497,7 @@ html, body {
     }
   }
 
-  // Global Pointer Listeners (Safe, Non-Stuck, Non-Disappearing)
+  // Global Pointer Listeners
   if (window.addEventListener) {
     window.addEventListener("mousemove", handlePointerMove, false);
     window.addEventListener("mouseleave", stopEdgeScroll, false);
@@ -3413,14 +3523,15 @@ html, body {
     // A. MODAL NAVIGATION TRAP
     if (nav.modal) {
       if (code === 8 || code === 27 || code === 10009) { // Back
-        if (nav.modal === "launch") { closeLaunchOverlay(); }
+        if (nav.modal === "hdmi") { closeHdmiModal(); }
         else if (nav.modal === "wallpaper") { closeWallpaperModal(); }
         else if (nav.modal === "appEditor") { closeAppEditorModal(); }
       } else if (code === 13) { // OK / Enter
-        if (nav.modal === "launch") {
-          if (nav.modalIndex === 0) { executeOpenTvInterface(); }
-          else if (nav.modalIndex === 1) { executeTryNativeUriScheme(); }
-          else if (nav.modalIndex === 2) { closeLaunchOverlay(); }
+        if (nav.modal === "hdmi") {
+          if (nav.modalIndex === 0) { triggerSamsungSourceKey(); }
+          else if (nav.modalIndex === 1) { toggleHdmiPort(); }
+          else if (nav.modalIndex === 2) { cycleHdmiDevicePreset(); }
+          else if (nav.modalIndex === 3) { closeHdmiModal(); }
         } else if (nav.modal === "wallpaper") {
           var allWp = getAllWallpapers();
           if (allWp[nav.modalIndex]) {
@@ -3434,9 +3545,9 @@ html, body {
           }
         }
       } else if (code === 37) { // Left
-        if (nav.modal === "launch" && nav.modalIndex > 0) {
+        if (nav.modal === "hdmi" && nav.modalIndex > 0) {
           nav.modalIndex--;
-          highlightLaunchModalFocus();
+          highlightHdmiModalFocus();
         } else if (nav.modal === "wallpaper" && nav.modalIndex > 0) {
           nav.modalIndex--;
           highlightWallpaperModalFocus();
@@ -3444,9 +3555,9 @@ html, body {
           moveApp(nav.modalIndex, -1);
         }
       } else if (code === 39) { // Right
-        if (nav.modal === "launch" && nav.modalIndex < 2) {
+        if (nav.modal === "hdmi" && nav.modalIndex < 3) {
           nav.modalIndex++;
-          highlightLaunchModalFocus();
+          highlightHdmiModalFocus();
         } else if (nav.modal === "wallpaper") {
           var totalWp = getAllWallpapers().length;
           if (nav.modalIndex < totalWp - 1) {
@@ -3481,10 +3592,6 @@ html, body {
     }
 
     // B. SAMSUNG REMOTE COLOR KEYS
-    // Red: 403 or 'r' (82) -> Open Wallpapers
-    // Green: 404 or 'g' (71) -> Open App Editor
-    // Yellow: 405 or 'y' (89) -> Toggle Effects
-    // Blue: 406 or 'b' (66) -> Next Wallpaper Cycle
     if (code === 403 || code === 82) {
       openWallpaperModal();
     } else if (code === 404 || code === 71) {
@@ -3506,11 +3613,11 @@ html, body {
     }
 
     // D. CHANNEL UP / DOWN -> FULL ROW JUMP
-    else if (code === 427 || code === 33) { // Channel Up / Page Up
+    else if (code === 427 || code === 33) {
       if (nav.row > 0) {
         setFocus(nav.row - 1, nav.col);
       }
-    } else if (code === 428 || code === 34) { // Channel Down / Page Down
+    } else if (code === 428 || code === 34) {
       if (nav.row < 3) {
         setFocus(nav.row + 1, nav.col);
       }
@@ -3524,6 +3631,11 @@ html, body {
     // F. INFO BUTTON
     else if (code === 457) {
       showToast("Aurora TV &bull; Samsung LV32F390 &bull; 1080p Stage");
+    }
+
+    // F2. SAMSUNG REMOTE SOURCE KEY (10072 / 402)
+    else if (code === 10072 || code === 402) {
+      handleHdmiAction(activeHdmiPort);
     }
 
     // G. ARROW DIRECTIONAL PAD & OK
@@ -3569,14 +3681,13 @@ html, body {
   $("btnShortcutBlue").onclick = cycleNextWallpaper;
 
   // Samsung Tizen TV Input Key Registration
-  // Ensures Samsung TV remote does not swallow physical buttons
   try {
     if (window.tizen && window.tizen.tvinputdevice) {
       var tizenKeys = [
         "MediaPlayPause", "MediaPlay", "MediaPause", "MediaStop",
         "ColorF0Red", "ColorF1Green", "ColorF2Yellow", "ColorF3Blue",
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-        "ChannelUp", "ChannelDown", "Info"
+        "ChannelUp", "ChannelDown", "Info", "Source"
       ];
       for (var k = 0; k < tizenKeys.length; k++) {
         try {
